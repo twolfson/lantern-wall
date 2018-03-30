@@ -1,0 +1,21 @@
+Smallest ball opening:
+  Half-circle: 39mm x 19mm
+  AAA: 10.25mm depth, 10.25mm width, tall height
+    Would need 2
+  CR2032: 1.2mm depth, 28mm width
+
+Solution 1:
+  AAAx2 + holder (uncertain if it would even fit...
+  Run wire to LED blob and attach once inside
+  Making them separate allows easier entry
+
+Solution 2:
+  CR2032 + perfboard + LED on board
+  Need LED sizings. Prob small enough though
+
+Tried out LEDs (photos on phone)
+
+5mm clear ones should work fine
+
+5mm clear white is bright. Might want 2x which means 2x power but we'll get to that later
+5mm red and other shaded colors are pretty weak. Will prob want clear LEDs for maximum lumens
