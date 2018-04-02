@@ -1,3 +1,4 @@
+# Dimensions
 Smallest ball opening:
   Half-circle: 39mm x 19mm
   AAA: 10.25mm depth, 10.25mm width, tall height
@@ -19,3 +20,54 @@ Tried out LEDs (photos on phone)
 
 5mm clear white is bright. Might want 2x which means 2x power but we'll get to that later
 5mm red and other shaded colors are pretty weak. Will prob want clear LEDs for maximum lumens
+
+# Electricity
+Got our battery holders, LEDs, and switches today
+
+Trying out LEDs
+
+Re-learning what we need for electronics to work
+
+Arduino supply: 3.3V or 5V
+LED voltage: 2-2.2V or 3-3.2V (depending on color)
+Maximum amperage for LED: 20mA
+
+Amperage is dynamic and will impact LED brightness directly
+
+Must have secondary voltage drop though to take excess as LED can only take so much
+
+3.3V source + 3-3.2V LED + 220ohm resistor
+
+3.3V - 3.2V = 0.1V remaining
+
+V=IR
+V/R = I
+0.1V/220ohm = ~0.5mA
+
+For 2-2.2V:
+
+1.1V remaining
+1.1V/220ohm = 5mA
+
+Amperage also directly affects how long battery life is:
+
+CR2032 http://data.energizer.com/pdfs/cr2032.pdf
+
+If we were able to drop at 2.0V (not really), then it'd be:
+
+240mAh (milliamp hours)
+  240mAh/5mA = 48 hours
+  240mAh/20mA = 12 hours
+  Still good for our purposes in both scenarios
+
+But based on their graph, we'd lose at 600 hours for 0.2mA
+
+which is 120mAh
+  120mAh/5mA = 24 hours
+  120mAh/20mA = 6 hours
+  Still good for our purposes in both scenarios
+  Pushing it a little with 20mA
+
+Going to try building a board with a 220ohm resistor and then ordering more parts based on result
+
+Doing a comparison between brightness of those LEDs
