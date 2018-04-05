@@ -71,3 +71,9 @@ which is 120mAh
 Going to try building a board with a 220ohm resistor and then ordering more parts based on result
 
 Doing a comparison between brightness of those LEDs
+
+--------------------------
+
+Got CR2032 today
+
+It's 3.3V fresh so I guess we need to deal with that... 1:1 with Arduino alternative voltage which is nice
