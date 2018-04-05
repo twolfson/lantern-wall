@@ -1,0 +1,50 @@
+Tonight we finished our first light
+
+Component placement worked well. That was prob the only thing that worked well
+
+We couldn't easily solder long runs
+
+We couldn't easily reference exactly 1 hole
+
+Solder kept on coming off of original joint
+
+We don't know ideal temperature and kept on burning board
+
+Eventually we got everything placed/soldered
+
+Then the connected the battery
+
+It lit up!
+
+Unfortunately, the battery clip was really shitty so it broke almost immediately (maybe overheated it causing hardening?)
+
+Then we soldered that back on and taped it
+
+It worked!
+
+And it fits in the lantern!
+
+Although it's hard to turn on/off, maybe put the switch on the outside
+
+Also the light doesn't diffuse great
+
+**Tasks for next time:**
+
+[ip] Buy new solder
+[ip] Buy rosin flux
+[n] Figure out how to clean soldering tip. Maybe buy a higher precision tip
+  It's likely oxidized causing poor heat conductivity
+  Actually, it's fine =_=
+  It's shiny where it counts
+  https://www.kitronik.co.uk/blog/clean-maintain-soldering-iron/
+Figure out if this perfboard's contacts are difficult
+[ip] Buy magnifying glass goggles
+Try making lots and lots of tests via spare wire + solder
+  Perfboard, wire, and solder are cheap
+  http://www.instructables.com/id/Soldering-102%3a-Soldering-a-jumper/
+Figure out how to not burn board... I'm guessing it's be precise and fast. Don't linger
+[n] Buy desired components: Better battery holders, maybe duals for multiple LEDs
+  Skipped for now, want to figure out my shitty soldering first
+Round corners of cut out items via Dremel or sandpaper
+Figure out better diffusing strategy (could be raise LEd via hot glue (still 1 sided), place 2 LEDs on opposite side of board (need more power))
+Play around with wire wrap and joining to jumper wires to "IC" connections
