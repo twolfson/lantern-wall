@@ -46,5 +46,5 @@ Figure out how to not burn board... I'm guessing it's be precise and fast. Don't
 [n] Buy desired components: Better battery holders, maybe duals for multiple LEDs
   Skipped for now, want to figure out my shitty soldering first
 Round corners of cut out items via Dremel or sandpaper
-Figure out better diffusing strategy (could be raise LEd via hot glue (still 1 sided), place 2 LEDs on opposite side of board (need more power))
+Figure out better diffusing strategy (could be raise LED via hot glue (still 1 sided), place 2 LEDs on opposite side of board (need more power))
 Play around with wire wrap and joining to jumper wires to "IC" connections

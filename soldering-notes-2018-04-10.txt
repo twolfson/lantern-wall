@@ -1,0 +1,90 @@
+Tried out soldering with new lead-free solder as well as playing around with temperature
+
+750F + lead-free solder
+
+Melts well, can easily see when it's back to reformed (shiny -> matte)
+Still burning board easily
+Solder sticking to iron a lot
+
+Moved to 450F
+
+Solder not melting at all
+Board not burning either though
+
+Moved to 550F
+
+Need to heat up the solder a little but getting a lot of control
+Able to cool sculpt the solder with the iron
+
+Moved to 500F
+
+Not melting not like 450F
+
+Moved to 600F
+
+Solder melts quicker
+Starts to brown board a little if I linger, nothing substantial though
+
+Moved back to 550F for remainder
+
+This seems good
+Although cool sculpting isn't preferred; solder might not be mechanically sound if we don't let it fully melt according to Adafruit
+Still was able to draw a square nicely =3
+
+Definitely not going back to 750F any time soon
+
+Going to play with solder sucker and jumpers now
+
+-----------
+
+Now reading through https://learn.adafruit.com/adafruit-guide-excellent-soldering/preparation
+
+They say 750F for lead-free... ;_;
+
+I guess I better try to get better...
+
+-----------
+
+Okay, results are in
+
+It was sloppier but it's probably the right way to solder
+
+Need to learn to not linger on joint
+
+Need to learn to learn to wait for solder to cool before joining for a long run
+
+The gloss/matte effect really really helps
+
+It allows me to verify that the solder is melting properly
+
+As well as how much of it is melting to know when I'm overmelting a part of a run
+
+Oh, and I'm aware of cleaning the tip more often
+
+Also started using a respirator mask but the internet seems to say it's doing nothing for chemical fumes...
+
+-----------
+
+Did 1 more run with a 3x3 square
+
+Did it perfectly with 0 charring on other side of board
+
+I think I'd ready =D
+
+I should prob practice with wires and desoldering now too though
+
+Oh well, it's 1AM. I'll do it another day
+
+**Remaining tasks:**
+
+[x] Figure out if this perfboard's contacts are difficult
+  Nope, it was my skill level and solder
+[ip] Try making lots and lots of tests via spare wire + solder
+  Perfboard, wire, and solder are cheap
+  http://www.instructables.com/id/Soldering-102%3a-Soldering-a-jumper/
+[x] Figure out how to not burn board... I'm guessing it's be precise and fast. Don't linger
+  Yep, don't linger ;) Also a good solder helps
+[x] Round corners of cut out items via Dremel or sandpaper -- Did this last time, it worked great
+[ ] Figure out better light diffusing strategy (could be raise LED via hot glue (still 1 sided), place 2 LEDs on opposite side of board (need more power))
+[n] Play around with wire wrap and joining to jumper wires to "IC" connections
+  I think we'll be fine
