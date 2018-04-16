@@ -197,6 +197,70 @@ Wow, that solved it so well. No more cut off problem. It's gone =D
 
 Now to build another board with this diffused LED
 
+Set up board with elevated LED this time too
+
+Also clipped 1 of the switch's edge leads as we don't need both and it complicates things
+
+Trick for short terminal CR2032 holder, used pliers to turn out pins
+
+Soldered everything nicely then realized that logistically battery holder was backwards =(
+
+Solder suckered it out successfully
+
+Beaded again, soldered lines again
+
+Definitely gave self harder situations
+
+Getting much better though, keeping things flat helps a lot
+
+Done, continuity looks good. Switch works when we want it to
+
+Have a bit of popped solder, going to reheat it
+
+Done, looks good
+
+We keep on burning flux on tip of soldering iron. I think it's normal but annoying to clean, tip, solder, clean, etc
+
+Waiting for circuit to cool before trying it out
+
+Added battery, looks great
+
+Sharpie, cutting, sanding edges, trying out in lantern
+
+It works fucking amazingly. Fuck yessss
+
+Okay, now we have to build lighting for all our lanterns
+
+Going to call it for tonight
+
+...
+
+It keps on going for a bit more
+
+I started exploring color schemes as I might need lead time to buying new LED colors
+
+I took previous mocks for dye and altered it
+
+I also created an array of LEDs on a breadboard to see current color options
+
+Settled on decent white/blue/green mix for now
+
 **Next steps:**
 
-[ ] Buy a smaller breadboard for easier prototyping. Maybe even a tri-pad stripboard with headers
+- [n] Buy a smaller breadboard for easier prototyping. Maybe even a tri-pad stripboard with headers
+    - This might have been more of an impulse thought. Deferring for now
+- [ ] Figure out lighting requirements for larger lanterns (using diffused LEDs)
+- [ ] Figure out how to upsize boards for sizes 3-5 lanterns
+- [ ] Figure out desired color scheme, might need to buy more LEDs
+- [x] Look into solder splatter
+    - Caused by using flux boiling/too much flux 
+        - https://stainedglassexpress.com/blog/2012/04/why-does-solder-bubble-and-splatter-when-soldering/
+    - Also can be quality of solder. Try a different one
+        - https://forum.allaboutcircuits.com/threads/reducing-solder-splatter.101820/
+    - Apparently avoid "no-clean" due to cleaning annoyances
+    - Going to go with Kester, seeing its name in Google search
+        - https://electronics.stackexchange.com/questions/117781/what-lead-free-solder-type-is-convenient-to-use-on-hand-soldering
+        - https://electronics.stackexchange.com/questions/186069/what-does-no-clean-solder-actually-mean
+    - Going with Kester Solder 83-7068-1402 as its the only Kester lead-free in small sizes that Amazon has
+        - It's got a "48" resin activated rosin core which should be good
+        - http://www.nteinc.com/kester/download/83-7068-1402.pdf
