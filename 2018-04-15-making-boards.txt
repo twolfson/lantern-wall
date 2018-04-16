@@ -179,3 +179,24 @@ Thought of a couple new strategies:
 Strategy for that new one:
 - Evaluate height of current board variant, verify it's short enough for smallest lantern
 - Run string through perfboard, verify it can be hung
+
+Another strategy:
+
+- Free-hand circuit with everything wired with no board (heavily inspired by SparkFun's video about it)
+
+Tried out putting a wire in an existing board to hang it. It works :+1:
+
+Now trying standalone breadboard again
+
+LED lighting feels off, have to be an extreme end of lantern to get diffusion. Want to explore diffuser caps
+
+Going to try out a 400 grit sandpaper hack... read about one in an earlier post and Instructables agrees
+  http://www.instructables.com/id/how-to-defuse-an-LED/
+
+Wow, that solved it so well. No more cut off problem. It's gone =D
+
+Now to build another board with this diffused LED
+
+**Next steps:**
+
+[ ] Buy a smaller breadboard for easier prototyping. Maybe even a tri-pad stripboard with headers
