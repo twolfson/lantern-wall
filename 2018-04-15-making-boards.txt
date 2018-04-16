@@ -158,3 +158,24 @@ Use breadboard again to find ideal placement
 It looked like at being just at the bottom of the lantern was fine...
 
 Also, definitely need to upsize board for size 3 but LED is fine
+
+Took a break for food
+
+Thought of a couple new strategies:
+
+- Simply tape the LED and coin cell together, then tape on string and hang it. No board needed
+- If we go with a circuit board, we should mount the wire on the other side of the board so it's easier to access the switch from the bottom instead of through
+- Improvement on top of that: create a board with a wire soldered into it (or string) for it to hang from
+    - Add traces for LED. Add LED hanging off of board
+
+```
+  ( + )   // Wire connecting to lantern hook
+ (  !  )  // Wire
+(   |   ) // Circuit board
+ (  *  )  // LED off of circuit board
+  (   )
+```
+
+Strategy for that new one:
+- Evaluate height of current board variant, verify it's short enough for smallest lantern
+- Run string through perfboard, verify it can be hung
