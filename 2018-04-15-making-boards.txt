@@ -245,13 +245,25 @@ I also created an array of LEDs on a breadboard to see current color options
 
 Settled on decent white/blue/green mix for now
 
+...
+
+Did one more task for the night after trying to figure out proof of concept for colors
+
+I set up alligator clip test for 2 white LEDs in series on largest lantern to see if we'd want/need more batteries/battery holders. I'm torn to be honest but it's better to be safe than sorry (time lags suck) so I'm getting 10 more of each
+
 **Next steps:**
 
 - [n] Buy a smaller breadboard for easier prototyping. Maybe even a tri-pad stripboard with headers
     - This might have been more of an impulse thought. Deferring for now
 - [ ] Figure out lighting requirements for larger lanterns (using diffused LEDs)
 - [ ] Figure out how to upsize boards for sizes 3-5 lanterns
-- [ ] Figure out desired color scheme, might need to buy more LEDs
+- [x] Figure out desired color scheme
+- [ ] Proof of concept colors with 10 breadboards and possibly F to F jumper-pinned wires
+    - We could build out + solder boards but arguably this is cheaper
+    - Maybe there's a middleground with header pins so we can swap out bulbs easily. Also acts as a nice standoff. Just not for smaller cases
+    - Was about 55 tie point breadboards but realizing we can use alligator clips instead which I have a looot of :muscle: (thanks Makey Makey)
+    - We only have 10 clips and it takes 3 but honestly, we can prob tape them
+    - I'm getting too tired to keep on diving into this. Deferring for another night
 - [x] Look into solder splatter
     - Caused by using flux boiling/too much flux 
         - https://stainedglassexpress.com/blog/2012/04/why-does-solder-bubble-and-splatter-when-soldering/
