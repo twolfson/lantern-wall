@@ -1,0 +1,160 @@
+We've got our new resistors in and now know that a CR2032 is 3.3V nomially so we should figure out how to maximize our amperage and see how it affects brightness
+
+White LED:
+  Forward voltage: 3V-3.2V
+  Max amperage: 20mA
+
+I think we can choose anywhere in range so let's go with high end
+
+Total voltage = LED voltage + resistor voltage
+White LED:
+  3.3V = 3.2V + V_r
+  V_r = 0.1V
+
+V=IR
+White LED reisistor:
+  0.1V = 0.02A*R
+  R = 5ohms
+  Closest we can get is 10ohms
+  This makes current:
+  0.1V/10ohm = I
+  I = 0.01A (10mA)
+
+  Previously for 220ohm:
+  I = 0.0005A (0.5mA)
+  Reading this from a multimeter: 2.58mA so calculation might be off somehow...
+  V = 2.58mA*220ohm = 0.57V
+  Weird, the multimeter voltage is correct too:
+  2.6V to LED, 0.6V to resistor
+
+  Going to play it safe and multiply the actual amperage to 20mA:
+  20mA/2.6mA = ~7.7x
+  220ohm/~7.7x = 28.6ohm
+  Next closest: 47ohm
+
+  47ohm result. Definitely brighter
+  Oddly voltage changed:
+  2.86V to LED, 0.42V to resistor
+  8.4mA (measured)
+
+  Let's go up to 20ohm...
+  Even brighter!
+  2.98V to LED, 0.3V to resistor
+  15.0mA (measured)
+
+  Adafruit says we can go up to 30mA? o_o
+    https://learn.adafruit.com/all-about-leds/forward-voltage-and-kvl
+  Prob going to say 20ohms is fine. Might try it out though for education >_> <_<
+
+  10ohm resistor
+  20.6mA (measured)
+  3.07V to LED, 0.21V to resistor
+
+Why are resistors at 10, 22, 47 variants?
+  It's logarithms. Thanks logarithms
+  https://electronics.stackexchange.com/a/68023
+
+It looks like it's normal for LEDs to vary voltage draw based on current
+  Also varies with temperature
+  https://electronics.stackexchange.com/a/173477
+
+Also, I've been reminded to verify the resistor can handle the power dispersion
+White LED resistor:
+  P = VI
+  P = 0.21V * 20.6mA
+  P = 0.0043W (4.4mW)
+  also
+  P = V^2/R
+  P = 0.21V^2 / ~10ohm
+  P = 0.0043W (4.4mW)
+
+Went back to measurements and verified resistor is true, damn variable LEDs =/
+
+Resistor ohms (V=IR; R=V/I): 20.0ohms
+Resistor ohms (V=IR; R=V/I): 10.2ohms
+
+Second board completed
+
+First laid out components, once again optimizing for vertical narrow layout
+
+Then soldered them in place
+
+I was much more confident this time
+
+Unfortunately, the LED and resistor weren't secured properly so they were off the board when I was done
+
+I loosened solder with heat and repositioned, broke pads, but eventually got them
+
+Clipped leads
+
+Then I beaded out would-be leads including double-checking LED polarity
+
+Then I soldered everything together
+
+Unfortunately, I accidentally soldered the switches leads
+
+There has to be a system to know when to not solder tight component leads to itself =/
+
+Maybe sharpie or coloring it
+
+Also had to lay board level due to solder being affected by gravity
+
+Got it much cleaner this time than v1
+
+Now waiting for board to cool before using CR2032 socket. We don't want to over-harden its metal again
+
+Verified its continuous though
+
+Plugged it in, looks great!
+
+Sharpied where to cut to prevent overcutting top/bottom
+
+Cut out with scissors
+
+Sanded edges/corners with P50, P100, and P180 sandpaper
+
+Looks great. Trying it out now
+
+It fits and works! It's even smaller than the last one
+
+It's so bright the LED is visible within the smallest lantern ._.
+
+There is a weird light pattern going on, I really want even LED lighting
+
+Maybe we can run wires instead and make it suspended in the center of the bulb somehow?
+
+A few ideas:
+
+- A hard support structure for the LED (e.g. tape/shrinkwrap)
+   - Would be difficult to insert into lanterns, maybe there's a smaller alternative
+   - Could do a wire but it's not guaranteed
+- Wire/clip in board at top of lantern and suspend LED down
+   - Possible but clipping in is prob easier said than done
+- Same board but LED is on a fixed-length wire
+   - Would make colors specific to lanterns
+   - Could make them headers
+   - Still have voltage restriction
+   - We might have this problem no matter what due to brightness of larger lanterns
+
+Yea, let's proof of concept that last one...
+   It would be much easier with a quarter bread board
+
+Also need to verify brightness works for large/small (i.e. 1 LED still good in large, maybe 2 LEDs + batteries
+
+Verified that 1 LED and current size board prob won't be enough for large lantern
+
+Let's build out the sizes 1-3 lanterns though
+
+Strategy 1:
+- Use (string + cut) or (tape measure) to find ideal length of wire
+- Affix LED to wire, prob via electric tape (don't have any F to F headers
+- Breadboard it and get overhang version working
+- Solder LED to proper length wire
+- Wire up a board, solder it, use it
+
+Maybe wait for a second...
+Use breadboard again to find ideal placement
+
+It looked like at being just at the bottom of the lantern was fine...
+
+Also, definitely need to upsize board for size 3 but LED is fine
