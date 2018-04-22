@@ -1,0 +1,41 @@
+Thought of this on April 17 but didn't have time to try out until now
+
+To determine the ideal resistance for an LED:
+
+- Take a potentiometer
+- Set it to its maximum resistance (verify via multimeter)
+- Wire up an LED circuit using potentiometer as its resistor
+- Wire multimeter into circuit as an ammeter
+- Drop potentiometer resistance until we hit 20mA current
+- Break circuit
+- Test resistance value of potentiometer
+- This is our ideal resistance for maximum brightness
+
+So how does it work in practice? Not too well, at least not too well with the potentiometer I have. I'd be a weaker one would be much better
+
+I have a 50k ohm potentiometer so getting between 10 and 20 ohms is very very difficult (especially when a little drunk)
+
+The 3.0-3.2V LEDs only got up to 10mA with the potentiometer at its 0 mark (apparently 1-2 ohms but was able to previously get 20mA with 10 ohms so not 100% on this)
+
+It worked decent with 2.0-2.2V LEDs (mostly would like it easier to not go over the boundary)
+
+I got ~21mA drawing and the potentiometer reads as 23.4 ohms
+
+Still prob a good idea to try with a 47 ohm and 20 ohm resistor to see how they handle it
+
+Apparently we can go over 20mA and the LED still works, prob ideal to not persist it though
+
+Quick math:
+
+Vcc = 3.3V
+Vled = 2.2V
+
+Thus, Vr = 1.1V
+
+V=IR
+
+1.1V=20mA*R
+R=1.1/0.020
+R=55ohm
+
+Doesn't quite line up but I think I'm still learning =/
