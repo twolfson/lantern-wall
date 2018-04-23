@@ -1,0 +1,24 @@
+Exploring color proof of concept
+
+Initial attempt:
+
+- Take a CR2032
+- Put it in a holder
+- Wrap resistor around 1 pole and tape it
+- Wrap LED around other pole and tape it
+- Connect remaining ends and tape them together
+
+Doesn't work very well. Components too loose
+
+Second attempt:
+
+Make a throwie minus the magnet
+
+- Take a CR2032
+- Put LED on both its ends
+- Tape it
+- Done
+
+Good, just don't hold it for too long due to no resistor
+
+Could also inline a resistor for the LED but don't really want to
