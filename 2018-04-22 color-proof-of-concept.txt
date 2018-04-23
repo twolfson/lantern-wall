@@ -73,3 +73,47 @@ Since we had 20mA on breadboard previously
 All done and wired up
 
 The board LED is definitely brighter than the taped LED
+
+Connected all of the LEDs
+
+It turns out I miscounted and needed to use a non-diffused LED
+
+Everything looks good
+
+The brightnesses do vary a lot but I think that's alright
+
+It's art, it doesn't have to be perfect/consistent
+
+The proper fix for this would be to swap our the resistors with potentiometers and tune the resistance appropriately
+
+Correction to my previous claim about being unable to test circuit board with an ammeter. It's possible if we turn off the switch and short-circuit around it with the ammeter
+
+Anyway, going to move forward with 10 ohm boards for each LED
+
+And add 1 more white LED to the list
+
+The pattern goes from left to right
+
+- Size 1. 1 white LED
+- Size 2. 1 green LED
+- Size 4. 2 white LEDs
+- Size 5. 2 blue  LEDs
+- Size 3. 1 white LED
+- Size 2. 1 blue  LED
+- Size 3. 1 blue  LED
+- Size 5. 2 white LEDs
+- Size 1. 1 green LED
+
+Totals:
+
+- White LEDs: 2 singles, 2 doubles (4) (6 total)
+- Green LEDs: 2 singles, 0 doubles (0) (2 total)
+- Blue  LEDs: 2 singles, 1 double  (2) (4 total)
+
+Plan once we've created all our boards:
+
+- For larger lanterns, take some cardboard and place boards on that. Tape them down for easy in/out
+
+For proof of concept, we used blue painter's tape (we were out of electrical) to seal up holes to toss in proof of concepts
+
+Fun fact: The proof of concepts were bright enough to illuminate the room with main lights off =3
