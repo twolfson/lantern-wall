@@ -29,6 +29,33 @@ Okay, back and deciding to still use a resistor. It was bugging out with the LED
 
 Going to also diffuse all LEDs for this experiment
 
-- [2 of 5] White LEDs (3 singles, 1 double)
+- [5 of 5] White LEDs (3 singles, 1 double)
 - [0 of 4] Blue  LEDs (2 singles, 1 double)
 - [0 of 2] Green LEDs (2 singles)
+
+After some more trial/error, layout attempt that works best is to make both LED and resistor linear/tightly packed battery then wrap their ends
+
+This minimizes the leads slipping from the tape
+
+```
+// Off/disconnected
+      & // LED
+     * *
+ ****   ***
++++++
+-----
+ ****   ****
+     ~~~  // Resistor
+
+
+// On/connected
+      & // LED
+     * *
+ ****   *
++++++    ** // Twisted wires
+-----    ***
+ ****   *
+     ~~~  // Resistor
+```
+
+It also helps to do an L bend on the battery side so they resist flipping
