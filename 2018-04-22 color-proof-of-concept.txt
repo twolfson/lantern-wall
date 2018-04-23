@@ -30,8 +30,8 @@ Okay, back and deciding to still use a resistor. It was bugging out with the LED
 Going to also diffuse all LEDs for this experiment
 
 - [5 of 5] White LEDs (3 singles, 1 double)
-- [0 of 4] Blue  LEDs (2 singles, 1 double)
-- [0 of 2] Green LEDs (2 singles)
+- [4 of 4] Blue  LEDs (2 singles, 1 double)
+- [2 of 2] Green LEDs (2 singles)
 
 After some more trial/error, layout attempt that works best is to make both LED and resistor linear/tightly packed battery then wrap their ends
 
@@ -59,3 +59,17 @@ This minimizes the leads slipping from the tape
 ```
 
 It also helps to do an L bend on the battery side so they resist flipping
+
+Ammeter checks:
+
+- Green LED: 10mA with 10 ohm resistor
+- White LED: 8mA with 10 ohm resistor
+- Blue LED: 8mA with 10 ohm resistor
+
+I'm going to bet they'll be a little more in a breadboard, no idea in circuit since we'd need to break the circuit (e.g. pluggable wires)
+
+Since we had 20mA on breadboard previously
+
+All done and wired up
+
+The board LED is definitely brighter than the taped LED
