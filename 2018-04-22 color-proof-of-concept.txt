@@ -22,3 +22,13 @@ Make a throwie minus the magnet
 Good, just don't hold it for too long due to no resistor
 
 Could also inline a resistor for the LED but don't really want to
+
+-----------------------
+
+Okay, back and deciding to still use a resistor. It was bugging out with the LED a little earlier
+
+Going to also diffuse all LEDs for this experiment
+
+- [2 of 5] White LEDs (3 singles, 1 double)
+- [0 of 4] Blue  LEDs (2 singles, 1 double)
+- [0 of 2] Green LEDs (2 singles)
