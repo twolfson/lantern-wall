@@ -117,3 +117,7 @@ Plan once we've created all our boards:
 For proof of concept, we used blue painter's tape (we were out of electrical) to seal up holes to toss in proof of concepts
 
 Fun fact: The proof of concepts were bright enough to illuminate the room with main lights off =3
+
+Getting late, calling it for the night
+
+Tested out the ammeter with the circuit. The theory works though somehow it's only 5mA. Maybe the battery died enough over time. Yea, it's already down to 2.8V
