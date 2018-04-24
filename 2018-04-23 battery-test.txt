@@ -1,0 +1,11 @@
+We're realizing that CR2032 aren't particularly rechargable so to avoid going through them like candy, we'd like to verify that the battery life is good in practice
+
+Starting with a fresh CR2032. Voltage reading is 3.3V. Amperage is 7.5mA
+
+Estimate based on 240mAh will be: 32 hours (240/7.5)
+
+Prob going to pause/play a bunch to avoid missing end
+
+Times:
+
+- 2018-04-23 8:11PM to ...
