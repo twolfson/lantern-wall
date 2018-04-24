@@ -8,4 +8,23 @@ Prob going to pause/play a bunch to avoid missing end
 
 Times:
 
-- 2018-04-23 8:11PM to ...
+- 2018-04-23 8:11PM to 1:39AM
+    -  9:50PM, still going strong
+    - 10:45PM: still going. 2.87V, 3.6mA -> 67 hours
+        - Prob having some brightness loss but can't tell because it's subtle and over time
+    - 12:49AM: still going. 2.87V, 3.45mA
+    -  1:39AM: still going. 2.87V, 3.47mA
+
+SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
+
+https://learn.sparkfun.com/tutorials/battery-technologies/lithium-polymer
+
+Learning that CR2032 has nominal discharge of 0.2mA
+
+https://cdn-shop.adafruit.com/datasheets/maxell_cr2032_datasheet.pdf
+
+Based on the lower right graph, it looks like we're running into a limitation caused by battery itself
+
+Could pulse at 6.8mA but there's prob an issue with non-pulse
+
+http://data.energizer.com/pdfs/cr2032.pdf
