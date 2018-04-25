@@ -1,0 +1,52 @@
+After getting through the initial portion of the battery testing, we've decided to continue building out the boards
+
+Not much new things to note so going to bullet it out:
+
+- Built blue board looking at diffused white
+- Battery is accessible
+- LED polarity is correct
+- Soldered it up
+- Verified connectivity
+- Waiting for it to cool
+- Added battery, missed a spot. Fixing
+- Reverified connnectivity
+    - It's neat how we can do connectivity for all one-way binding due to LED's diode nature (it's in the name, yey)
+- Cooled, battery, good
+- Mark, cut, sand, disco
+
+- Same for a white LED
+- Keep in burning flux due to staying/revisiting pad too often before letting it cool
+- Connectivity good
+- Cooling taking too long, cut now
+- Sand
+- Battery, good
+- Disco
+
+Taking approximately 20-30 minutes per circuit
+
+- Green LED to round it out
+- Same layout again
+- 1:29AM
+- Almost improperly rotated battery holder. Phew
+- If the pad is smoking after you're done, it's likely due to overheated flux
+- Soldering complete, lots of burned flux =(
+- 1:47AM
+- Maybe should start using wires instead of solder runs...
+- Connectivity good
+- Cut, sand
+- Battery
+- Looks good
+- 1:55AM
+
+New solder still leaving lots of little splatter everywhere
+
+It might be me or the iron or the temperature...
+
+Also need to open window, noticable smell despite using fume exhaustor and respirator
+
+Calling it for the night
+
+**Next time:**
+
+- Open a window
+- Use less solder by using wires
