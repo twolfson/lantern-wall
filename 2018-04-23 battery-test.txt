@@ -8,12 +8,18 @@ Prob going to pause/play a bunch to avoid missing end
 
 Times:
 
-- 2018-04-23 8:11PM to 1:39AM
+- 2018-04-23 8:11PM to 1:39AM (5h 28m)
     -  9:50PM, still going strong
     - 10:45PM: still going. 2.87V, 3.6mA -> 67 hours
         - Prob having some brightness loss but can't tell because it's subtle and over time
     - 12:49AM: still going. 2.87V, 3.45mA
     -  1:39AM: still going. 2.87V, 3.47mA
+- 2018-04-24 6:34PM to 2:01AM (7h 27m)
+    -  6:34PM, 2.85V, 4.45mA (straaange)
+    -  8:27PM, 2.80V, 3.30mA
+    - 10:00PM, 2.79V, 3.08mA
+    - 11:52PM, 2.80V, 3.23mA
+    -  2:01AM, 2.76V, 2.84mA
 
 SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
 
@@ -28,3 +34,25 @@ Based on the lower right graph, it looks like we're running into a limitation ca
 Could pulse at 6.8mA but there's prob an issue with non-pulse
 
 http://data.energizer.com/pdfs/cr2032.pdf
+
+-----------
+
+# 2018/04/24
+
+It's not the battery's discharge limiting us. It's the LED limiting the current due to the battery's voltage
+
+https://www.electronics-tutorials.ws/diode/diode12.gif
+
+As the voltage to an LED increases, its current increases
+
+Each LED color has different ideal voltages but 3.0-3.2V is normal for the ones we're using
+
+Unfortunately CR2032 is dipping under 3.0V for our usage =/
+
+We'd probably be better off with 3.7V batteries but I think CR2032 might be good enough for the project as is
+
+We aren't looking to always maximize lighting and this avoid risks of fires
+
+And definitely lasts for at least 12 hours (probably 60 based on existing guesses)
+
+Going to go ahead and wire up remaining circuits. We can always hack them later and they're low cost
