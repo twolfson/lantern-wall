@@ -20,6 +20,9 @@ Times:
     - 10:00PM, 2.79V, 3.08mA
     - 11:52PM, 2.80V, 3.23mA
     -  2:01AM, 2.76V, 2.84mA
+- 2018-04-25 10:34PM to 1:51AM (3h 17m)
+    - 10:34PM, 2.82V, 3.93mA (a lot higher, usually 2.8-3.3mA)
+    -  1:51AM, 2.78V, 2.94mA
 
 SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
 
