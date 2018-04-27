@@ -8,21 +8,24 @@ Prob going to pause/play a bunch to avoid missing end
 
 Times:
 
-- 2018-04-23 8:11PM to 1:39AM (5h 28m)
+- 2018-04-23 8:11PM to 1:39AM (5h 28m, total: 5h 28m)
     -  9:50PM, still going strong
     - 10:45PM: still going. 2.87V, 3.6mA -> 67 hours
         - Prob having some brightness loss but can't tell because it's subtle and over time
     - 12:49AM: still going. 2.87V, 3.45mA
     -  1:39AM: still going. 2.87V, 3.47mA
-- 2018-04-24 6:34PM to 2:01AM (7h 27m)
+- 2018-04-24 6:34PM to 2:01AM (7h 27m, total: 12h 55m)
     -  6:34PM, 2.85V, 4.45mA (straaange)
     -  8:27PM, 2.80V, 3.30mA
     - 10:00PM, 2.79V, 3.08mA
     - 11:52PM, 2.80V, 3.23mA
     -  2:01AM, 2.76V, 2.84mA
-- 2018-04-25 10:34PM to 1:51AM (3h 17m)
+- 2018-04-25 10:34PM to 1:51AM (3h 17m, total: 16h 12m)
     - 10:34PM, 2.82V, 3.93mA (a lot higher, usually 2.8-3.3mA)
     -  1:51AM, 2.78V, 2.94mA
+- 2018-04-26 10:15AM to
+    - 10:15AM, no recording due to other initial reads being high
+    -  9:34PM, 2.76V, 2.42mA (11h 19m, total: 27h 31m)
 
 SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
 
