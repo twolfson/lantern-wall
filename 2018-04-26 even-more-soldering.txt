@@ -1,0 +1,82 @@
+Going to solder using wires this time. Haven't yet bought a window screen (meant to today) so going to avoid opening a window until later. Hopefully reduced solder usage is good enough
+
+- Blue LED
+- Was able to lay out with only using IC leads
+- Looks good, a little hard to force down resistor leads with iron but good
+    - Prob easier to do with hand then solder
+    - Still getting splatter from solder =/
+- Much faster too
+- Trying out
+- Good
+- Cut, sand, resolder battery as it feels loose, sand more, good, neeeext!
+
+- Anothe blue LED
+- 12:16AM
+- Prepping ICs
+- Discovered the CR2032 has a little missing plastic so it can easily drop its gate. So clever yet secret
+- Broke first battery holder terminal ._.
+- Done placing at 12:26AM
+- Started soldering, had a bit of a hiccup with leads conflicting with each other and over soldering, good now
+- Done soldering at 12:33AM
+- Lol, nvm -- missed positive terminal
+- Fixed, now done at 12:36AM
+- Have to wait for it to cool so going to start on another one in parallel
+
+Testing/clipping CR2032 holders and switches
+6 clipped, 6+6 tested, and good!
+
+- Board is cooled, battery in, looks good
+- Cut, skipping sanding for now (can do in bulk too)
+
+- 12:44AM
+- White LED
+- Placed, clipped eagerly, soldered, looks great!
+- 12:53AM
+- Cool enough, drop gate, load battery, works!
+- Cut it up
+- 12:56AM
+- Wow, so fast -- 12 minutes as opposed to 20 or 30
+
+- Blue LED
+- 12:57AM
+- Wow, new record or something
+- 1:04AM, done
+- Waiting for it to cool
+- Soldered in a new CR2032 battery holder for next one
+- Blue is good
+- Cutting now
+- Done, good. 1:09AM
+
+- Green LED
+- 1:09AM
+- Soldered, same as last one
+- Battery in and good
+- 1:16AM
+- Cut again, no sand
+
+- 1 thin board with space for 2 circuits
+- Soldered both CR2032 holders on eagerly due to leveling/vice issues earlier
+- 1:25AM
+- Double setup up and soldered both circuits
+- Was nice for simultanoues cooling of leads
+- 1:39AM finish
+- Cut again, no sand
+
+- 1:43AM
+- Last one board, white LED
+- Solder in CR2032 holder, so much easier than pliers
+- Fuck, a lead clipping went under a keyboard key =(
+    - Prob need to pop-out keyboard to fix it
+- Finished soldering
+- Battery in, good!
+- 1:52AM
+- Cut out
+
+- Sand all our 7 boards
+- 2:14AM
+- Done
+- Done with everything
+
+- All boards light up
+- Going to try placement another day since it's now quite late
+- Really happy with progress though
