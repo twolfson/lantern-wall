@@ -26,16 +26,19 @@ Times:
 - 2018-04-26 10:15AM to
     - 10:15AM, no recording due to other initial reads being high
     -  9:34PM, 2.76V, 2.42mA (11h 19m, total: 27h 31m)
-    - 2014-04-27
+    - 2018-04-27
     -  2:15AM, 2.69V, 2.20mA (16h  0m, total: 32h 12m)
     -  8:52AM, 2.73V, 2.14mA
     -  6:47PM, 2.72V, 1.82mA
     - Changed multimeter battery @ 7:20PM
     -  7:20PM, 2.74V, 1.93mA (33h  5m, total: 49h 17m)
-    - 2014-04-28
+    - 2018-04-28
     -  2:00AM, 2.71V, 1.71mA (39h 45m, total: 55h 57m)
     -  2:44PM, 2.70V, 1.37mA
     -  9:36PM, 2.69V, 1.23mA (59h 21m, total: 75h 33m)
+    - 2018-04-29
+    -  3:11AM, 2.67V, 1.01mA
+    - 11:46AM, 2.67V, 0.86mA (20mA); 0.600mA (2mA)
 
 SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
 
