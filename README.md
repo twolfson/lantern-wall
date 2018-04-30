@@ -1,5 +1,5 @@
 # lantern-wall
-Documentation of my glowing lantern wall project
+Documentation for a glowing lantern wall
 
 ## Summary
 While decorating my apartment, I decided to leverage a picture rail and attempted to make a wall of [Cloud Clouds][]
@@ -11,13 +11,16 @@ During the process, I realized that cloud clouds would look too bulky for what I
 Now the result is one-off perf-boards with a CR2032 battery, LED, switch, and weak resistor
 
 **Off:**
-*Coming soon!*
+
+![Lanterns off](IMG_20171014_244317916.jpg)
 
 **On, room lights on:**
-*Coming soon!*
+
+![Lanterns on, room lights on](IMG_20180429_215254110.jpg)
 
 **On, room lights off:**
-*Coming soon!*
+
+![Lanterns on, room lights off](IMG_20180429_215220297.jpg)
 
 ## Documentation
 *Coming soon!*
