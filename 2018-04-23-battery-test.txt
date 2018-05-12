@@ -41,6 +41,45 @@ Times:
     - 11:46AM, 2.67V, 0.86mA (20mA); 0.600mA (2mA)
     - 2018-04-30
     -  2:38AM, 2.63V, 0.50mA (20mA); 0.398mA (2mA)
+    - 10:19AM, 2.62V, 0.42mA (20mA); 0.336mA (2mA)
+    -  7:23PM, 2.60V, 0.34mA (20mA); 0.287mA (2mA)
+    - 2018-05-01
+    -  1:22AM, 2.60V, 0.22mA (20mA); 0.237mA (2mA)
+    - 10:29AM, 2.60V, 0.22mA (20mA); 0.198mA (2mA); 99.3uA (200uA)
+    - 2018-05-02
+    -  1:03AM, 2.57V, 0.15mA (20mA); 0.134mA (2mA); 81.7uA (200uA)
+    - 10:17AM, 2.57V, 0.13mA (20mA); 0.120mA (2mA); 75.2uA (200uA)
+    - 2018-05-03
+    -  1:03AM, 2.56V, 0.09mA (20mA0; 0.087mA (2mA); 61.0uA (200uA)
+    - 10:07AM, 2.55V, 0.09mA (20mA); 0.082mA (2mA); 58.7uA (200uA)
+    - 2018-05-04
+    - 12:05AM, 2.54V, 44.5uA
+    - 10:08AM, 2.54V, 41.1uA
+    - 2018-05-05
+    -  1:38AM, 2.53V, 34.3uA
+    -  2:08PM, 2.52V, 29.5uA
+    - 2018-05-06
+    -  1:34AM, 2.51V, 23.4uA
+    - 12:50PM, 2.51V, 21.7uA
+    - 2018-05-07
+    -  1:11AM, 2.50V, 18.2uA
+    -  9:58AM, 2.50V, 16.3uA
+    - 2018-05-08
+    -  1:07AM, 2.49V, 14.0uA
+    -  9:56AM, still on
+    - 2018-05-09
+    -  1:48AM, 2.48V, 10.7uA
+    -  9:13AM, 2.48V, 09.3uA, side not visible but top is
+    - 2018-05-10
+    - 12:21AM, 2.47AM, 08.2uA
+    - 10:00AM, still on
+    - 2018-05-11
+    -  1:27AM, 2.46V, 06.1uA
+    -  9:00AM, still on
+    - 2018-05-12
+    - 1:56AM, 2.45V, 05.2uA
+    - Stopped due to getting tired of recording when light is barely visible
+    - Probably unusable after 1mA
 
 SparkFun has been informative that batteries often start a few fractions of a volt about their nominal voltage (e.g. 4.3V for 3.7V nominal lithium polymer, 1.5V for 1.2V nominal AA/AAA)
 
