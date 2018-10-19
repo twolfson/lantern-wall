@@ -192,6 +192,25 @@ Final product:
 
 ![Lanterns on, room lights off](IMG_20180429_215220297.jpg)
 
+## October 2018
+We revisited the project to make it easier to turn lights on/off. The old process was:
+
+- Wiggle circuit out of lantern
+- Toggle switch
+- Wiggle circuit back into lantern
+
+Wiggling can take an annoying amount of time
+
+We did some research and settled on the following triggering our lanterns:
+
+- Magnetic reed switches, https://www.amazon.com/gp/product/B07239WZGF/
+    - Effective price: $0.45/board
+    - Buying excess of these is necessary as they are fragile and easily break when affixing to existing circuits
+- Bar magnets, https://www.amazon.com/gp/product/B00BZ9YU88/
+    - Effective price: $1.06/lantern
+
+We can now slide in/out the bar magnet on the bottom of the lantern which is marginally easier and still consumes 0 power
+
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
 
