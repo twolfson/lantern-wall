@@ -1,0 +1,186 @@
+# 2018-10-05
+How to do a switch:
+
+- Electronic relay switch (too bulky, requires high voltage and power)
+- NFC/RF control, constantly drains power
+- Push button/relocating switch, would need to play with how it gets exposed
+- Physical latch (e.g. swing a hook around) -- same difficulty to engage
+- Jumper pins -- same difficulty to engage
+- Magnetic switch (e.g. something magnetic that can be moved up/down/left/right to become switch (this seems ideal))
+    - This seems to be known as a magnetic sensor. No standby power needed
+        - https://www.mouser.com/datasheet/2/240/Littelfuse_Reed_Sensors_59140_Datasheet.pdf-934389.pdf
+- Hall effect sensor? (no, requires active voltage)
+- Inductive sensor, yes but would require active voltage
+
+Is there a non-off the shelf version that would work with a thin piece of metal and a magnet?
+
+Like
+        __
++ ___.--  .___  -
+
+Open
+
+
++ ___.____.___ -
+       (Magnet)
+Closed
+
+I mean, this is effectively a reed switch but inline in the circuit
+
+- Reed switch seems better for searching
+    - https://www.digikey.com/product-detail/en/littelfuse-inc/MDSM-4R-12-18/HE151TR-ND/475807
+    - Size seems fantastic =D
+
+To mount magnet, perfboard isn't magnetic but lantern is
+So can make base material magnetic or find a reed switch that has a pretty loose detection area
+
+They are measured in ampere-turns
+
+We could also overbuild this to use the velcro 3M and put those on magnets
+
+Documents say that reed switches are pretty sensitive
+For mounting, it might be best to find a clip-in solution so they can be swapped like fuses
+
+--------------
+
+Tilt switches might also work
+
+www.oddwires.com/tilt-ball-switch-sensor/
+
+Nah, prob too hard
+
+----------------
+
+Okay, going to try out reed switches and mount via alligator clips
+Actually, that might be too tall for circuit...
+
+https://learn.sparkfun.com/tutorials/connector-basics/temporary-connectors
+Screw terminals seem promising
+I don't really want to get into crimping tehcnology, would much rather bend the wire at that point
+
+There are small alligator clips, that's probably our best bet...
+https://www.digikey.com/catalog/en/partgroup/miniature-alligator-clips/78025
+
+Maybe we buy the fuses, play with them, and try to mount to see what happens
+
+Oh, there is "PC Pin" termination style so we're fine. Also dodging glass body, fuck accidentally breaking these with a drop
+
+https://www.digikey.com/products/en/switches/magnetic-reed-switches/193?k=&pkeyword=&pv183=3524&sf=0&FV=ffe000c1&quantity=&ColumnSort=-69&page=1&stock=1&datasheet=1&pageSize=25
+
+Cheapest gull wing style is $0.91
+https://www.digikey.com/products/en/switches/magnetic-reed-switches/193?k=&pkeyword=&pv258=496&pv258=48&pv258=117&pv258=60&sf=1&FV=ffe000c1&quantity=1&ColumnSort=1000011&page=1&stock=1&datasheet=1&pageSize=25
+
+PC Pin version is $1.41
+https://www.digikey.com/products/en/switches/magnetic-reed-switches/193?k=&pkeyword=&pv258=60&sf=1&FV=ffe000c1&quantity=1&ColumnSort=1000011&page=1&stock=1&datasheet=1&pageSize=25
+
+Axial glass version is $0.51
+https://www.digikey.com/products/en/switches/magnetic-reed-switches/193?FV=ffe000c1&quantity=1&ColumnSort=1000011&page=1&stock=1&datasheet=1&pageSize=25
+
+Sadly Amazon beats out the prices, $9 for 20 ($0.45 each)
+https://www.amazon.com/DIKAVS-Reed-Switch-Magnetic-Switches/dp/B07239WZGF/ref=sr_1_9?ie=UTF8&qid=1538779785&sr=8-9&keywords=reed+switch
+
+There's no datasheet but meh, this isn't a scientific project
+
+---------------------
+
+# 2018-10-09
+Reed switches arrived. Personal magnet works only at very close distance and in proper orientation
+
+Flat fridge magnet doesn't do shit
+
+Disc fridge magnet works well close up and works really well perpendicular and a little far away
+I thought it would be an oposite effect where parallel is best but nope, it must be that the field is close enough that it can align whereas too perpendicular prevents it from doing so
+
+Going to go with bar magnets as those can lie flat and achieve the same effect
+
+---------------------
+
+# 2018-10-11
+Bar magnets arrived. They're as big as I expected but waaay stronger
+
+They work in any orientation with the switches (including both magnet orientation and switch orientation) and from a distance of 1.5"
+
+Now realizing that our plan of velcro on the magnet to the circuit base is poor due to the magnet being too big for our smallest lantern's holes
+
+Maybe we could use a mounting solution to the bottom bracket of the lantern?
+Like hook and loop around the magnet to the bracket?
+
+We prob have to make the magnet perpendicular to the bottom bracket...
+
+Also we have to trigger 2 magnetic switches for our large lanterns (damn choices to use 2 separate circuits =/ -- I don't really regret this, it was the right choice for flexibility on colors)
+
+Anyway, for now let's install switches on the smallest and largest lanterns so we can play with distances
+
+It looks like we might even be magnetising the frame of the lantern with these magnets so we might have less work necessary =o
+
+...
+
+After a long break, and contemplating cutting up magnets previously. I'm realizing we could cut them, attach them with a small gap (e.g. hot glue + popsicle stick), and place them over the bottom bracket -- thus sticking via magnetism and preventing them from falling off due to pushing on the circuitboard
+
+-----------------------
+
+# 2018-10-16
+Maybe we can sandwich the bottom bar of lanterns between 2 magnets?
+
+Nope, that doesn't work. They're too thick
+
+Also, the circuit seems to be diamagnetic too ._.
+
+Let's just wire a circuit up and play with it
+
+-----------------------
+
+# 2018-10-18
+Wired up small circuit
+
+Works great =D
+
+Magnet still too big
+
+Tried to break it with a hammer, no luck and too loud to try harder
+
+Tried to cut with saw, saw is magnetic and designed for wood. No go
+
+Hmmm, these magnets are so strong that we could mount them to the wall ._.
+
+Nah, that will ruin the walls aesthetic -- looking weird when they're off
+Unless we mount them behind the lanterns?
+Nah, that'll be too far from circuit
+
+Maybe buy those desk toy cubes or magnetic push pins
+Bring a circuit with us to the store to try it out
+
+It looks like I've been over thinking it, I can simply shove it in the bottom of the hole and the circuit pulls it down and holds it in place
+
+Taped up a magnet as a demo
+It looks a little sloppy but anything dangling from the bottom will. It's nice we have the prettier mode with a normal switch as well
+
+Let's do the big circuit now
+
+Ah, no large solder clumps. So much easier to add to
+Woot, 1 large magnet on back triggers both =D
+
+Was starting to think I didn't have enough switches. Now I realize I bought 20 switches and 12 magnets. We're in business to do them all =D
+
+Broke 1 switch at its glass, no bueno D=
+
+...
+
+Done! Done soldering up all our circuits =D There was 11 total to solder to, we broke 3 more switches in the process (damn tiny glass) but it's done
+
+The magnets work really well on the larger lanterns as we can slide them in/out without issue
+The smallest and second smallest though want to move the circuit with the lantern which is annoying. Maybe some cardboard will resolve this?
+Oh well, going to leave it be for now
+
+...
+
+Late at night: 1 of the 12 circuits is bugging out. It seems the switch is broken and turning on/off at random times. Slamming it on the table seems to force it off, not really preferred...
+Going to swap the switch another day
+
+---------------------
+
+# 2018-10-19
+Loosened solder, freed up bad switch, and tossed it
+Swapped in new switch and it works great
+
+Down to 3 switches so much have lost 5 so far (12 in boards + 5 bad + 3 unused = 20 bought)
