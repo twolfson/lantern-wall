@@ -209,7 +209,7 @@ We did some research and settled on the following triggering our lanterns:
 - Bar magnets, https://www.amazon.com/gp/product/B00BZ9YU88/
     - Effective price: $1.06/lantern
 
-We can now slide in/out the bar magnet on the bottom of the lantern which is marginally easier and still consumes 0 power
+We can now slide in/out the bar magnet on the bottom of the lantern which is marginally easier and still consumes no power
 
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
