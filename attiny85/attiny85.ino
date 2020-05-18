@@ -34,6 +34,7 @@ void loop() {
 
 // When we receive an external interrupt on INT0
 // DEV (pretty confident): PCINT0_vect is pin change interrupt request which is unrelated to INT0 interrupt
+//   We cannot use this vector due to it being disabled in power-down, see 7.1 in datasheet, page 34
 ISR(PCINT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
   if (digitalRead(interruptPin) == HIGH) {
