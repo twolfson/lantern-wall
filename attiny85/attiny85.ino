@@ -4,12 +4,11 @@
 
 // Set up our constants
 int ledPin = PB0; // Same as built-in programmer board for ease of use
-int interruptPin = PCINT2; // PB2
+int interruptPin = PB2; // INT0 pin
 bool ledState = LOW;
 
 void setup() {
   pinMode(ledPin, OUTPUT);
-  // DEV: Unsure if it's a good idea to reuse `PCINT2` for both `pinMode` and `PCMSK` but it seems to work
   // DEV: Interrupt pin is now set to trigger when shorted to GND, otherwise would need pull-down resistor with VCC
   //   See Fritzing schematic for clarification
   pinMode(interruptPin, INPUT_PULLUP);
@@ -33,7 +32,8 @@ void loop() {
   delay(100);
 }
 
-// When we receive interrupt 0
+// When we receive an external interrupt on INT0
+// DEV (pretty confident): PCINT0_vect is pin change interrupt request which is unrelated to INT0 interrupt
 ISR(PCINT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
   if (digitalRead(interruptPin) == HIGH) {
