@@ -10,6 +10,8 @@ bool ledState = LOW;
 void setup() {
   pinMode(ledPin, OUTPUT);
   // DEV: Unsure if it's a good idea to reuse `PCINT2` for both `pinMode` and `PCMSK` but it seems to work
+  // DEV: Interrupt pin is now set to trigger when shorted to GND, otherwise would need pull-down resistor with VCC
+  //   See Fritzing schematic for clarification
   pinMode(interruptPin, INPUT_PULLUP);
 
   // Configure interrupt/sleep
