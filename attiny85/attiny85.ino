@@ -10,8 +10,7 @@ bool ledState = LOW;
 void setup() {
   pinMode(ledPin, OUTPUT);
   // DEV: Unsure if it's a good idea to reuse `PCINT2` for both `pinMode` and `PCMSK` but it seems to work
-  // DEV: We tried/failed to use `INPUT_PULLUP` so this must be used with an external pull-up resistor
-  pinMode(interruptPin, INPUT);
+  pinMode(interruptPin, INPUT_PULLUP);
 
   // Configure interrupt/sleep
   PCMSK |= (1 << interruptPin); // Enable interrupt handler (ISR) for our chosen interrupt pin
