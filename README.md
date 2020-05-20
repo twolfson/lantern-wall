@@ -220,9 +220,7 @@ We settled on using an [ATtiny85][] for the following reasons:
 
 - Through-hole solid-state relays seemed to draw more current in quiescent state (ATtiny @ 3.3V is 0.1uA, relays were at least 1uA)
     - Example: https://www.digikey.com/product-detail/en/toshiba-semiconductor-and-storage/TLP222AF/TLP222AF-ND/871243
-    - Battery is only 200mAh so 2 years of idling is 6mAh
-> 0.1uA * 1mA/1000uA * 60s * 60m * 24h * 365d * 2y = 6307mAh...
-> Uhhh, I think we never adjusted for mAh vs Ah x_x
+    - Battery is only 200mAh so 2 years of idling is 1% (~2mAh; `0.1uA * 1mA/1000uA * 2y * 365d/1y * 24h/365d`) vs 10% (`1uA * ...`)
 - Easy wiring with built-in pull-up resistor for interrupt
 - Already had programmer for it, we saw `PIC12F629` allows for 1nA current on sleep
     - https://www.jameco.com/Jameco/Products/ProdDS/223790.pdf
