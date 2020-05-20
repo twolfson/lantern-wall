@@ -214,15 +214,17 @@ We can now slide in/out the bar magnet on the bottom of the lantern which is mar
 ## May 2020
 After enough time, we found inserting/removing magnets each time was tedious to do for all 9 boards
 
-We considered many alternatives (e.g. pull cord switch, solid-state relays)
+We considered many alternatives (e.g. pull cord switch, capacitive touch, solid-state relays) and for a long time thought that low-current draw would be too high
 
-We settled on using an [ATtiny85][] for the following reasons:
+We were wrong about low-current draw being too much, as 0.1uA from an [ATtiny85][] works great for our purposes =)
 
-- Through-hole solid-state relays seemed to draw more current in quiescent state (ATtiny @ 3.3V is 0.1uA, relays were at least 1uA)
+We settled on the [ATtiny85][] as opposed to other ICs for the following reasons:
+
+- Through-hole solid-state relays draw more current in quiescent state (at least 1uA, vs 0.1uA for ATtiny @ 3.3V)
     - Example: https://www.digikey.com/product-detail/en/toshiba-semiconductor-and-storage/TLP222AF/TLP222AF-ND/871243
-    - Battery is only 200mAh so 2 years of idling is 1% (~2mAh; `0.1uA * 1mA/1000uA * 2y * 365d/1y * 24h/365d`) vs 10% (`1uA * ...`)
+- Battery is only 200mAh so 2 years of idling drains 1% (~2mAh; `0.1uA * 1mA/1000uA * 2y * 365d/1y * 24h/365d`) vs 10% for `1uA`
 - Easy wiring with built-in pull-up resistor for interrupt
-- Already had programmer for it, we saw `PIC12F629` allows for 1nA current on sleep
+- Discovered `PIC12F629` too late, which allows for `1nA` current on sleep, but already had ATtiny/AVR programmer
     - https://www.jameco.com/Jameco/Products/ProdDS/223790.pdf
 
 We were also excited about features like:
