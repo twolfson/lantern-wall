@@ -233,7 +233,14 @@ We were also excited about features like:
 
 [ATtiny85]: https://www.microchip.com/wwwproducts/en/ATtiny85
 
+We prototyped and created new boards with this setup, detailed info can be found in `2020-05-magnet-toggle.txt`
 
+Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be found in the corresponding `2020-05-magnet-toggle` folder
+
+> Using Fritzing after our first couple boards significantly sped up production since we didn't have to overthink placement as much
+
+[Arduino]: https://www.arduino.cc/
+[Fritzing]: https://fritzing.org/home/
 
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
