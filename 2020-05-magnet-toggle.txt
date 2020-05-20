@@ -1,0 +1,2012 @@
+# 2020-03-07
+Got a wild hair to revisit current draw for ATtiny85 in super low power mode (only woken up by interrupts)
+
+A little buzzed at the moment too so taking everything slow
+
+Reusing setup from previous notes, `2019-10-06-attiny-usb-setup.txt`
+
+```
+- Set up Tools menu with following configuration:
+    - Programmer: USBtinyISP
+    - Board: ATtiny25/45/85
+    - Following unlocked once board changed
+    - Processor: ATtiny85
+    - Clock: Internal 1 MHz
+        - We can choose higher numbers which make the device run slower (seems counterintuitive)
+        - Avoid external clocks if you can, we did set 20MHz external originally based on Digikey but apparently we could have bricked it =X
+- Upload a modified blink sketch to the device (attiny board doesn't have LED_BUILTIN variable preset)
+    ```
+    int LED_BUILTIN=0;
+
+    // the setup function runs once when you press reset or power the board
+    void setup() {
+      // initialize digital pin LED_BUILTIN as an output.
+      pinMode(LED_BUILTIN, OUTPUT);
+    }
+
+    // the loop function runs over and over again forever
+    void loop() {
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+      delay(1000);                       // wait for a second
+      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+      delay(1000);                       // wait for a second
+    }
+    ```
+```
+
+Got blink working
+
+To measure ATtiny current usage, need to have it out of socked so we can inline measure our current
+
+Double wired a second ATtiny on breadboard, verified blink worked
+Although, it's sharing traces so unsure whether LED is getting power from our ATtiny or the other one =/
+
+Removed socketed ATtiny and it's all working =D
+Verified by updating sketch
+
+Readings:
+20.8mA with LED steady on
+3.8mA with LED steady off
+
+Now to add in infinite sleep and such
+
+https://learn.sparkfun.com/tutorials/h2ohno#low-power-attiny
+https://www.nongnu.org/avr-libc/user-manual/group__avr__sleep.html
+
+```arduino
+#include <avr/sleep.h>
+int LED_BUILTIN=0;
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  sleep_mode();
+//  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//  delay(1000);                       // wait for a second
+//  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//  delay(1000);                       // wait for a second
+}
+```
+
+New current: 3.0mA
+
+Still have some more items to edit (e.g. disabling ADC)
+
+```
+#include <avr/sleep.h>
+int LED_BUILTIN=0;
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  sleep_mode();
+//  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//  delay(1000);                       // wait for a second
+//  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//  delay(1000);                       // wait for a second
+}
+```
+
+New current: 2.6mA
+
+Felt like I was still missing something
+Yep, was doing sleep mode very wrong ._.
+
+Following setup yields: 0.5uA @_@
+    and according to webpage, that's only because USB is 5V (can go lower)
+
+http://www.technoblogy.com/show?KX0
+
+```
+#include <avr/sleep.h>
+int LED_BUILTIN=0;
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  sleep_enable();
+  sleep_cpu();
+//  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//  delay(1000);                       // wait for a second
+//  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//  delay(1000);                       // wait for a second
+}
+```
+
+Trying to get interrupts working but something is severly messed up
+Nobody is being clear on what pinout to use =/
+
+```
+#include <avr/sleep.h>
+int LED_BUILTIN=0;
+bool light_state=HIGH;
+
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // Define how device will sleep and that we don't need ADC
+//  ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
+//  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+
+  // Configure interrupt handling
+  attachInterrupt(1, toggle_light, CHANGE);
+  digitalWrite(LED_BUILTIN, light_state);   // turn the LED on (HIGH is the voltage level)
+}
+
+// the loop function runs over and over again forever
+void loop() {
+//  sleep_enable();
+//  sleep_cpu();
+
+//  delay(3000);                       // wait for a second
+//  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//  delay(1000);                       // wait for a second
+}
+
+void toggle_light() {
+  light_state = !light_state;
+  digitalWrite(LED_BUILTIN, light_state);
+}
+```
+
+Going to try duplicating https://www.instructables.com/id/ATtiny85-Interrupt-Barebones-Example/
+
+Tried copy/paste of setup on breadboard
+Nothing
+Going to pause this for now
+Prob try it with an Arduino first to reduce user error issues
+
+Calculations for lantern though (so we interrupt wake based on reed switch)
+2 years runtime: (24 * 365 * 2) * 0.5e-6 = 8.7mAh so barely a dent in a battery ._.
+> Correction, 2020-05-19: 0.5e-3 (uA -> mA) but result is same
+
+# 2020-03-09
+Trying out interrupts with Arduino UNO for sanity
+
+https://learn.sparkfun.com/tutorials/processor-interrupts-with-arduino/all
+
+```
+/*
+Simple Interrupt Example 1
+by: Jordan McConnell
+SparkFun Electronics
+created on 10/29/11
+*/
+
+int ledPin = 13;  // LED is attached to digital pin 13
+int x = 0;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+  Serial.begin(9600);  //turn on serial communication
+}
+
+void loop() {
+  digitalWrite(ledPin, LOW);
+  delay(3000); //pretend to be doing something useful
+  Serial.println(x, DEC); //print x to serial monitor
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+    x++;
+    digitalWrite(ledPin, HIGH);
+}
+```
+
+It's kind of working...
+
+Getting a LOT of bouncing though as the monitor keeps on incrementing numbers in the hundreds ._.
+
+Still getting weird behavior...
+
+Playing around with setup, trying next sketch. Still bad
+
+Ohhhh, their diagram is using a pull-down resistor setup
+So the pin isn't just floating when the switch is open
+We had this realization when we connected the pin directly to GND
+
+Yep, works perfect now -_-;;
+
+Toggling works as expected, though found `!=` doesn't work as expected
+
+```
+int ledPin = 13;  // LED is attached to digital pin 13
+bool ledState = LOW;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+  Serial.begin(9600);  //turn on serial communication
+  digitalWrite(ledPin, ledState);
+}
+
+void loop() {
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+    ledState = !ledState;
+    Serial.println(ledState);
+    digitalWrite(ledPin, ledState);
+}
+```
+
+Really not seeing much bounce at all. I think it's due to pins having RC filters as they've documented before
+
+Reading pinout diagram
+https://store.arduino.cc/usa/arduino-uno-rev3
+ATmega328P
+https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+
+I should really read through their documentation more thoroughly
+Lots of fascinating content here ._. https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+
+Page 49 tells us INT0/INT1 are what we want
+https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+There's PCINT0 and such but those are pin change interrupt, unsure what that means...
+
+Confused... sounds like we can pin interrupt any pin
+https://playground.arduino.cc/Main/PinChangeInterrupt/
+Maybe it's not for sleep mode purposes though?
+Ah, it's a ganged response. More like 1 of these 4 pins changed -- figure out it out
+https://forum.arduino.cc/index.php?topic=221428.0
+
+Looking back on page 3, I see it
+PD2, INT0; PD3, INT1
+PD2 = Pin digital 2, I guess
+
+Looking at ATtiny85
+There's only 1 INT# pin and that's PB2, INT0
+    Page 2 of datasheet
+There's plenty of PCINT but yea... not what I want
+
+Verified sleep toggling probably works just as nice as it looks
+
+```
+#include <avr/sleep.h>
+int ledPin = 13;  // LED is attached to digital pin 13
+bool ledState = LOW;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+  Serial.begin(9600);  //turn on serial communication
+  digitalWrite(ledPin, ledState);
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  sleep_enable();
+  sleep_cpu();
+  Serial.println("sleeping...");
+  delay(100); // Delay is to give time for `println` to finish transmitting before sleep occurs again
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+  ledState = !ledState;
+  digitalWrite(ledPin, ledState);
+  Serial.println(ledState);
+  delay(100); // Delay is to give time for `println` to finish transmitting before sleep occurs again
+}
+```
+
+Going to explore sleep waking via timers next (how we'd toggle between LED colors)
+
+It looks like `analogWrite()` is really just a PWM wave, https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+So unsure how much sleeping can be done for an RGB
+Unless there's an IC in the RGB for receiving data then holding those values for the RGB
+(or maybe we just let the ATtiny run for that time period
+Prob 3 hours maximum, can do calculation for that...
+I just forget non-sleeping power usage from ATtiny =/
+
+...
+
+Took a bit to start reading manual
+Seems like pull-up resistors inline might be what we need, though no reference voltage for the pin still
+Nope, doesn't work as desired
+
+Watch https://youtu.be/2kr5A350H7E
+but unconvinced this will run timer when in sleep mode
+
+Yea... not going to dive into timers and interrupts at the moment
+Seems kind of complex...
+This says at most 8s for delays
+which is plenty long but also realizing lantern wall doesn't require it
+https://learn.sparkfun.com/tutorials/h2ohno/all#low-power-attiny
+
+Script emulating basic twinkle with sleeping
+
+Took a bit but got adjusting brightness working
+Analog pins are for reading only, not for controlling via PWM
+PWM ones are digital pins with special markers, listed on reference page too
+https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
+
+```
+#include <avr/sleep.h>
+int ledPin = 6;  // LED is attached to digital pin 13
+bool ledState = HIGH;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+  Serial.begin(9600);  //turn on serial communication
+  digitalWrite(ledPin, ledState);
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+//  sleep_enable();
+//  sleep_cpu();
+  analogWrite(ledPin, ledState ? rand()/(RAND_MAX/256) : LOW);
+  Serial.println(rand()/(RAND_MAX/256), DEC);
+  delay(1000);
+
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+  ledState = !ledState;
+  digitalWrite(ledPin, ledState);
+}
+```
+
+Updating code to have on/off state instead of auto-sleeping
+
+```
+#include <avr/sleep.h>
+int ledPin = 6; // PWM compatible pin for our LED
+bool should_sleep = false;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+  Serial.begin(9600);  //turn on serial communication
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  // If we're in sleep mode, turn off our LED and go to sleep
+  if (should_sleep) {
+    sleep_enable();
+    sleep_cpu();
+  // Otherwise, twinkle our LED
+  } else {
+    update_led();
+    delay(1000);
+  }
+}
+
+void disable_led() {
+  analogWrite(ledPin, 0);
+}
+
+void update_led() {
+  analogWrite(ledPin, rand()/(RAND_MAX/256));
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+  // Toggle our sleep state
+  should_sleep = !should_sleep;
+
+  // If our LED should go off, then do it immediately
+  if (should_sleep) {
+    disable_led();
+  }
+  // DEV: No need to enable LED as the loop will execute immediately
+}
+```
+
+That was a bit nuanced in toggling back on but it works =)
+Also the button is so finnicky with bounce sometimes =/
+
+If we build it, then prob should write a software debounce in practice
+
+```
+#include <avr/sleep.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+bool should_sleep = false;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+//  Serial.begin(9600);  //turn on serial communication
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  // If we're in sleep mode, turn off our LED and go to sleep
+  if (should_sleep) {
+    sleep_enable();
+    sleep_cpu();
+  // Otherwise, twinkle our LED
+  } else {
+    update_led();
+    delay(1000);
+  }
+}
+
+void disable_led() {
+  analogWrite(ledPin, 0);
+}
+
+void update_led() {
+  analogWrite(ledPin, rand()/(RAND_MAX/256));
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+  // Toggle our sleep state
+  should_sleep = !should_sleep;
+
+  // If our LED should go off, then do it immediately
+  if (should_sleep) {
+    disable_led();
+  }
+  // DEV: No need to enable LED as the loop will execute immediately
+}
+```
+
+Works for toggling off but not back on...
+Let's start with simpler toggling LED on interrupt change...
+
+```
+#include <avr/sleep.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+bool ledState = HIGH;  // variable to be updated by the interrupt
+//bool should_sleep = false;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+  attachInterrupt(0, increment, RISING);
+//  Serial.begin(9600);  //turn on serial communication
+  digitalWrite(ledPin, ledState);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_IDLE);
+}
+
+void loop() {
+  sleep_enable();
+  sleep_cpu();
+}
+
+// Interrupt service routine for interrupt 0
+void increment() {
+  ledState = !ledState;
+  digitalWrite(ledPin, ledState);
+}
+```
+
+Got the above working, had to change to SLEEP_MODE_IDLE which I'm not sure is as efficient. I guess we can check right now
+
+Yea... seems to use 1.9mA in this mode...
+
+Page 34 of datasheet covers it
+We've got idle, ADC noise reduction, and power-down
+Power-down looks like it should work with INT0 change...
+
+Trying manual callouts for _SLEEP_CONTROL_REG and MCUSR in https://www.nongnu.org/avr-libc/user-manual/sleep_8h_source.html
+but no luck
+
+```
+    MCUCR = 0b10;
+    _SLEEP_CONTROL_REG = 0b01;
+```
+
+We added an `sei();` call but no change
+
+https://www.avrfreaks.net/forum/attiny85-wake-pin-interrupt-not-working
+
+```
+void loop() {
+  sleep_enable();
+  sei();
+  sleep_cpu();
+  delay(100);
+}
+```
+
+We see the current spiking when we press our button so something is definitely happening
+
+Ohhh, we are attaching wrong...
+https://forum.arduino.cc/index.php?topic=524949.msg3580423#msg3580423
+Can't do a RISING or FALLING
+
+Having issues getting ISR version to work
+Going to go back to sleepless mode to try out toggling there...
+
+```
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+bool ledState = LOW;  // variable to be updated by the interrupt
+//bool should_sleep = false;  // variable to be updated by the interrupt
+
+void setup() {
+  //enable interrupt 0 (pin 2) which is connected to a button
+  //jump to the increment function on falling edge
+  pinMode(ledPin, OUTPUT);
+//  attachInterrupt(0, increment, RISING);
+//  Serial.begin(9600);  //turn on serial communication
+  digitalWrite(ledPin, ledState);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+//  MCUCR = 0b10;
+}
+
+void loop() {
+//  sleep_enable();
+//  sei();
+//  sleep_cpu();
+  delay(100);
+}
+
+// Interrupt service routine for interrupt 0
+ISR(INT0_vect) {
+//  ledState = !ledState;
+  digitalWrite(ledPin, HIGH);
+//  delay(100);
+}
+```
+
+...
+
+Deciding to first just use some interrupt code
+https://www.instructables.com/id/ATtiny85-Interrupt-Barebones-Example/
+
+After some reading and troubleshooting, found the fucking issue -_-;;;;;
+I was using INT0, not PCINT2 since the numbering changes here...
+
+```
+// Requires headers for AVR defines and ISR function
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#define INTERRUPT_PIN PCINT2  // This is PB1 per the schematic -- ADJUSTED
+#define INT_PIN PB2           // Interrupt pin of choice: PB1 (same as PCINT1) - Pin 6 -- ADJUSTED
+#define LED_PIN PB0           // PB4 - Pin 3 -- ADJUSTED
+#define PCINT_VECTOR PCINT0_vect      // This step is not necessary - it's a naming thing for clarit
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  cli();                            // Disable interrupts during setup
+  PCMSK |= (1 << INTERRUPT_PIN);    // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6)
+  GIMSK |= (1 << PCIE);             // Enable PCINT interrupt in the general interrupt mask
+  pinMode(INT_PIN, INPUT_PULLUP);   // Set our interrupt pin as input with a pullup to keep it stable
+  sei();                            //last line of setup - enable interrupts after setup
+}
+
+void loop() {
+  delay(100);
+}
+
+// This is the interrupt handler called when there is any change on the INT_PIN
+// ISR is defined in the headers - the ATtiny85 only has one handler
+
+ISR(PCINT_VECTOR)
+{
+    digitalWrite(LED_PIN, HIGH);
+}
+```
+
+Now to widdle this down until we get what we need
+
+Yea, we didn't need `cli/sei/pinMode` though they're prob good practices
+Key items were toggling masks
+
+```
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+int LED_PIN = PB0;
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  PCMSK |= (1 << PCINT2); // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6) -- ADJUSTED
+  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+}
+
+void loop() {
+  delay(100);
+}
+
+ISR(PCINT0_vect) {
+  digitalWrite(LED_PIN, HIGH);
+}
+```
+
+New version of toggle LED with low power
+
+```
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+bool ledState = LOW;  // variable to be updated by the interrupt
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+
+  PCMSK |= (1 << PCINT2); // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6) -- ADJUSTED
+  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+
+  digitalWrite(ledPin, ledState);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  sleep_enable();
+  sleep_cpu();
+  delay(1000);
+}
+
+// Interrupt service routine for interrupt 0
+ISR(PCINT0_vect) {
+  ledState = !ledState;
+  digitalWrite(ledPin, ledState);
+}
+```
+
+Fuck yesss, LED is toggling on when our button is pressed
+Then ironically toggling off when our button is released (due to ISR being level change only)
+
+Running at 5V
+Sleep power: 0.5uA
+Active power incl green LED: 40.8mA
+    Might be different current usage for RGB LED (prob will in fact)
+Prob less current when using 3.3V
+
+I'm so fucking thrilled about this =D =D
+
+```
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+int interruptPin = PCINT2;
+bool ledState = LOW;  // variable to be updated by the interrupt
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  // DEV: Unsure if it's a good idea to reuse `PCINT2` for both `pinMode` and `PCMSK` but it seems to work
+  pinMode(interruptPin, INPUT); // Stabilization done by external resistor as it wasn't functioning as floating pin previously
+
+  PCMSK |= (1 << interruptPin); // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6) -- ADJUSTED
+  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+
+  digitalWrite(ledPin, ledState);
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  sleep_enable();
+  sleep_cpu();
+  delay(100);
+}
+
+// Interrupt service routine for interrupt 0
+ISR(PCINT0_vect) {
+  if (digitalRead(interruptPin) == HIGH) {
+    ledState = !ledState;
+    digitalWrite(ledPin, ledState);
+  }
+}
+```
+
+Toggling woooorks =D
+
+Now toggle + twinkling
+
+Easy peasy adjustment =D
+
+```
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+int ledPin = PB0; // PWM compatible pin for our LED
+int interruptPin = PCINT2;
+bool should_sleep = false;  // variable to be updated by the interrupt
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  // DEV: Unsure if it's a good idea to reuse `PCINT2` for both `pinMode` and `PCMSK` but it seems to work
+  pinMode(interruptPin, INPUT); // Stabilization done by external resistor as it wasn't functioning as floating pin previously
+
+  PCMSK |= (1 << interruptPin); // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6) -- ADJUSTED
+  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  // If we're in sleep mode, turn off our LED and go to sleep
+  if (should_sleep) {
+    sleep_enable();
+    sleep_cpu();
+  // Otherwise, twinkle our LED
+  } else {
+    update_led();
+    delay(1000);
+  }
+}
+
+void disable_led() {
+  analogWrite(ledPin, 0);
+}
+
+void update_led() {
+  analogWrite(ledPin, rand()/(RAND_MAX/256));
+}
+
+// Interrupt service routine for interrupt 0
+ISR(PCINT0_vect) {
+  if (digitalRead(interruptPin) == HIGH) {
+    // Toggle our sleep state
+    should_sleep = !should_sleep;
+
+    // If our LED should go off, then do it immediately
+    if (should_sleep) {
+      disable_led();
+    }
+    // DEV: No need to enable LED as the loop will execute
+  }
+}
+```
+
+Current draw varies from 5mA to 20mA with current random behavior
+Then drops down to 0mA (0.5uA) when off =3 =3
+
+Now exploring power requirements for LEDs
+
+Adafruit LEDs are 12V x_x https://www.adafruit.com/product/1547
+Form factor is also 30mm which is quite tight but I feel like that's a good constraint to have
+
+https://www.adafruit.com/product/3094
+SMD5050 LEDs are 3.5-5.3V, https://cdn-shop.adafruit.com/product-files/3094/WS2812B.pdf
+Available for cheaper via Adafruit, https://www.digikey.com/product-detail/en/sparkfun-electronics/COM-11821/1568-1800-ND/6163706
+
+We can prob do 2x 3V CR2032
+Just 4x for a 12V will be too visible
+We can prob do 2x 3V and use a resistor to step down voltage for MCU and LED
+
+Oh... they say 12V but datasheet says otherwise, https://cdn-shop.adafruit.com/datasheets/WS2801.pdf
+It's -0.3V-6V with stronger outputs (but we don't care about output...)
+
+Current exploring reed switches with built-in strain relief (through-axis was nice but so risky to break wires
+https://www.mouser.com/datasheet/2/89/CotoClassic-CT10-Datasheet-1667029.pdf
+Yeesh, 20mm length. That means it needs to be in the center of our board
+To be fair, the board would only be 4 components: Reed switch + tiny + battery (prob bottom layer) + LED (prob hot glue to components or solder. Ah, mounting putty!)
+
+We still need to test our RGB LEDs for lifespan
+
+Let's do a rough calculation via green LED, really rough since red and blue will have different drains
+
+40mA * 1h = 40mAh
+200mAh / 40mA = 5h, so few @_@
+At 2x CR2032, I feel like they might drain differently and that's also full power
+So more like 10h, then 20h on average
+Yeesh, still kind of high...
+What were our numbers for the lantern wall?
+20mA for the LED
+I guess our MCU is drawing 20mA too?! @_@
+
+Running MCU without LED looks like 3mA drain
+LED running full blast is 18.7mA
+So my numbers from before were wrong
+
+Interesting: If I set a super high delay, the MCU stays on until that finished executing (or so it seems)
+Setting a high delay though doesn't affect power consumption
+
+So power usage would be 40h on average I guess?
+That's plenty then ._.
+
+Lantern wall implementation is:
+200mAh/20mA = 10h
+It's prob gone on for longer due to lower voltage -> lower current
+
+But we need a damned RGB LED test
+
+...
+
+RGB driven off of 5V with 220 resistor on each RGB and common cathode
+Getting 33.5mA
+
+Feel like not 100% accurate to what MCU will deliver
+
+Fwiw, green LED in this setup is 10.5mA
+Very different from 15mA we saw before
+
+But using these estimates, we're still pretty good on numbers
+Prob 35mA for estimates for RGB including MCU
+200mAh/35mA = 6-7h, pretty solid
+Especially if we've got some dimming going on
+
+Next step is probably concluding figuring out setup/sourcing components
+Buying them and getting to testing lifespans
+Also for this variant, definitely need to consider maintenance
+Might want to be able to reprogram them as we wish
+
+...
+
+Was looking over batteries
+CR2032 nominal discharge is 0.2mA, maximum 3mA apparently, https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium_cells
+Though datasheet shows up to 6.8mA, https://data.energizer.com/pdfs/cr2032.pdf
+This made me curious about what our current rate is on our lanterns
+
+Resistor voltage: 24.4mV
+R = 10 ohm
+V=IR -> I=V/R -> 2.44mA
+Fwiw, battery voltage is 3.1V
+
+I guess next test is powering ATtiny and LEDs off of this to see performance ._.
+
+Another option to CR2032 would be 3x AAAA or AAA
+Obviously not as compact but still nice
+
+Operating voltage for ATtiny85 is 1.8-5.5V (needs to be "V" version to get down to 1.8V, otherwise 2.7V)
+
+We should really just try 1x CR2032 to see what happens
+Then maybe run 2 in parallel for double current if need be
+If our cap is 6mA via parallel, then we need to consider other options (e.g. flat LiPo packs (def don't use hot glue there ._.)
+
+...
+
+Maybe revisit LilyPad since it's already designed for maintenance
+https://www.sparkfun.com/products/11364
+This is 20mm diameter
+
+Unsure $5 is worth it for the PCB...
+Reprogramming pins though...
+Maybe worth IC test clip?
+Maybe we can DIY with perfboard vias
+Maybe we can figure out a right angle option
+I think we need to just get the parts and start playing
+
+# 2020-03-10
+LiPo batteries have way higher discharge capabilities
+https://cdn-shop.adafruit.com/product-files/328/LP785060+2500mAh+3.7V+20190510.pdf
+1500mA possible
+
+Connected CR2032 to RGB LED, 15mA drain and light is barely illuminating =/
+Battery is at 3V
+
+So either our RGB LED needs more current/voltage or we're effed
+
+Since we're not going to blow out our RGB LED with 3V
+Let's skip the 220 resistors
+
+Sooo we wired up anode wrong before and unsure how the fuck the test was working earlier
+Also getting weird behavior where only red or green and blue turn on but not both
+7mA drain for green and blue directly to RGB, plenty bright -- slowly decreases, down to 6.25mA in 10s
+When red is plugged in, all current jumps up to 40mA -- as though there's a short or something
+
+Interesting, due to conventional current -- the definitions of anode and cathode are flipped
+Anode is + and cathode is -
+Mnemonic I've always used: Anode - A negative, Ca+ hode
+
+Added back 220 resistors and we're at 6mA AND seeing white light (verified purple when we remove green)
+I guess something weird was happing with red LED -- that's 2.2V max I guess
+
+Doubling up CR2032
+It's not super bright like I'd like so prob going to be an issue =/
+
+Though no 220 resistors were plenty bright
+So many only throttle red and see where we get?
+Eh, might get inconsistent color (i.e. variable voltages)
+    I wonder how RGB is even balanced ._.
+Ah, I see -- equal resistance seems to be close enough but 3:6:1 ratio with 800:1000:1200 resistors apparently is if we want to get best
+https://hackaday.io/project/168579-weather-color-strip/log/171408-rgb-led-color-balancing-experimentation
+
+Sticking to resistors for now...
+
+Lazily using their graph for red LED
+3V = I*R + V(I)
+    Going to just trial and error it
+    I = 10mA: 3V = 10mA*R + 1.85V
+        R = (3-1.85)/10e-3 = 115 ohm
+    I = 50mA: 3V = 50mA*R + 2.25V
+        R = (3-2.25)/50e-3 = 15 ohm
+Ooh, so we can see better brightness if we use lower resistance but not none possibly
+    Since we're getting plenty of voltage drop for 220 resistors
+    Let's try out 20s (prob 22) (we've got 10, 20, 47)
+
+Swapped to 20 ohms
+Not much brighter =/
+17mA draw though so that's a lot higher ._.
+
+Let's go for 2 CR2032 in parallel
+
+Voltage will remain same so we don't need to update resistor
+
+Well... it's brighter but not blinding white like we've seen before...
+
+Getting 24mA
+Straaaange
+
+Sadly I'm too tired to keep on troubleshooting this tonight
+I think the current rates we're seeing are simply what CR2032 does at high current rates
+and it's normal for it to keep dropping current continuously
+
+As a result, might be better to do constant color for constellation wall (at which point ATtiny is so damn silly but we can still use it)
+Or we can figure out a new power solution (e.g. LiPo)
+We don't need high capacity
+
+This 150mAh LiPo has max discharge of 1A @_@, https://cdn-shop.adafruit.com/product-files/1317/C1515_-_Li-Polymer_402025_150mAh_3.7V_with_PCM.pdf
+But it's also $6/battery... https://www.adafruit.com/product/1317
+
+So if we do 20 dots, that's $120
+which isn't bad but also isn't amazing
+Also I'd rather avoid LiPo for something that's hooked up to a reed switch
+Don't want something flaky wired up to something hazardous
+
+LIR2450 is same size as CR2032 but no discharge current issue (discharge current is 2x capacity soo 120mAh -> 240mA discharge)
+https://cdn-shop.adafruit.com/datasheets/LIR2450.pdf
+    $3 each and less worried about them, https://www.adafruit.com/product/1572
+    Also possible rechargable
+Super cute but very pricey $15 LiIon charger, https://www.adafruit.com/product/1573
+    This is strictly for LIR2450
+
+CR2450 is 620mAh capacity, 3V operating, 9mA pulse
+    https://www.amazon.com/Energizer-CR2450-Lithium-Battery-ECR2450/dp/B007YCNIMO/ref=asc_df_B007YCNIMO/
+    https://data.energizer.com/pdfs/cr2450.pdf
+
+LR2032 is 3.6V and 50mAh, https://www.thebatterysupplier.com/products/li-ion-rechargeable-2032-button-cells-lr2032.html
+https://www.powerstream.com/p/Lir2032.pdf
+Discharge is max 70mA though @_@
+
+The holders we currently have work for CR2016, 2025, and 2032
+    https://www.amazon.com/gp/product/B00NQB2UNU/
+CR2016 is 100mAh capacity, https://data.energizer.com/PDFs/cr2016.pdf
+2025 is 170mAh, https://data.energizer.com/PDFs/cr2025.pdf
+2032 is 235mAh, https://data.energizer.com/pdfs/cr2032.pdf
+
+Apparently can buy 10 LIR2450 for $11 via Newegg so not bad at all, https://www.newegg.com/unbranded-cdc002/p/0TY-005X-00002
+
+# 2020-03-13
+Reading through SparkFun notes
+https://learn.sparkfun.com/tutorials/how-to-power-a-project
+
+They usually use 9V and rely on voltage regulator on development boards
+
+Adafruit Trinket solves maintenance and has 16V regulator onboard, https://www.adafruit.com/product/1501
+Only $6
+
+Started looking at regulators
+But realizing it's going to be some work since these usually rely on tuning via LRC circuits
+https://www.mouser.com/Semiconductors/Power-Management-ICs/Voltage-Regulators-Voltage-Controllers/Switching-Voltage-Regulators/_/N-668jt?Rl=668jtZer88Z1yzvdtpZ1yvbdhdSGT&Keyword=voltage+regulator&FS=True&Ns=Pricing|0
+And I'm iffy if I want those headaches just yet
+
+https://www.adafruit.com/product/1500
+3.3V version has same 16V support and a little smaller form factor, 27mm x 15mm x 4mm which just might fit in a 30mm dot
+Another version, https://www.adafruit.com/product/3500
+
+$10 for 27mm round with battery JST, https://www.adafruit.com/product/1222
+Same but newer https://www.adafruit.com/product/3501
+RGB LED built in o_o
+
+Pro micro is $18 and 1.3" (33mm)
+https://www.sparkfun.com/products/12587
+
+$1, 3.3V, 250mA voltage regulator, https://www.adafruit.com/product/2166
+Fuck yea, accepts 4-20V. Just what we want
+I guess everytthing is packinged in there to do proper tuning
+I guess I was looking at wrong components on Mouser
+
+https://www.mouser.com/Semiconductors/Power-Management-ICs/Voltage-Regulators-Voltage-Controllers/Linear-Voltage-Regulators/_/N-5cg9g?P=1y95l53Z1z0wa2e&Ns=Pricing|0
+Yep, here's a $0.36 variant on Mouser. still TO-92 package, https://www.mouser.com/ProductDetail/STMicroelectronics/L78L33ACZ?qs=sGAEpiMZZMtUqDgmOWBjgLAmId5B%2FjmHpfabeMkxbt0%3D
+Yeesh, 2V voltage drop -- which Adafruit said was an issue on these 78 models, https://www.mouser.com/datasheet/2/389/cd00000446-1795493.pdf
+Still an issue on TI version, https://www.mouser.com/ProductDetail/Texas-Instruments/UA78M33CKCS?qs=sGAEpiMZZMtUqDgmOWBjgCb759GUAfeo3KRAlmcMgDM%3D
+
+Looked for what Adafruit had, L4931-3.3
+Found it, still plenty cheap -- $0.65, https://www.mouser.com/ProductDetail/STMicroelectronics/L4931CZ33-AP?qs=sGAEpiMZZMs4JNdIIroPwfRvEf43RJhM
+Verified 0.4-0.6V drop, https://www.mouser.com/datasheet/2/389/cd00000971-1795479.pdf
+Issue in past search was should have looked at LDO voltage regulators (low dropout)
+
+One issue though... Quiescent current looks like 50uA
+which is a huge hit to our ATtiny
+
+Slick 2xCR2032 holder, overpriced on SparkFun but nice concept
+Sadly we verified CR2032 wasn't enough for us current-wise
+https://www.sparkfun.com/products/12618
+
+# 2020-03-14
+To reiterate, we've got a few problems up in the air:
+
+- Form factor, more/less solved -- Do 30mm (or something like that) with stack of board then battery underneath, secured by a mounting square or similar
+    - Still need a breakout solution for software updates but that should be easily done via right angle connectors
+- Power system, need to figure out voltage (prob 3-6V) and have at least 20mA power
+    - We can't use a voltage regulator since it'll drain 50uA in quiescent mode which doesn't fit our requirements
+    - This voltage can prob change based on LED but we'll need to figure that out
+- LED choice, need to find one that fits our price point and design aesthetic
+    - Could possibly build one via thermoformed plastic but would seems excessive...
+
+5V should work for our purposes
+Just no batteries come at the voltage
+
+Let's explore the voltages we can find...
+
+CR2032 - 3V nominal (under current requirements but calculating anyway), https://data.energizer.com/pdfs/cr2032.pdf
+LIR2032 - 3.7V nominal, https://www.powerstream.com/p/Lir2032.pdf
+Any LiPo battery, 3.7V nominal -- Possibly 4.2V at immediate usage, https://cdn-shop.adafruit.com/product-files/258/C101-_Li-Polymer_503562_1200mAh_3.7V_with_PCM_APPROVED_8.18.pdf
+
+If we use 2x LIR2032 or LiPo, then get 7.4V nominal (maybe 8.4V)
+
+3xAAA - 4.5V
+How big is this?
+https://en.wikipedia.org/wiki/AAA_battery
+10.5mm diam x 44.5mm
+Damn, too big for our wants. We'd have a square that's 30.5mm x 44.5mm
+
+AAAA - 8.3mm diam x 42.5mm, https://en.wikipedia.org/wiki/List_of_battery_sizes
+    Not much better
+
+1/2AA is 3-3.6V
+A11 - 10.3x16.0mm, 6V but 55mAh (LR932 stacked together)
+
+SR cells, 1.55V
+LR cells, 1.5V
+
+Lots of SR and LR options...
+Most are low mAh though...
+Ones over 100mAh
+SR42, SR43, SR44, LR52
+
+I think LR44 is super common, even has its own wiki page
+Let's explore that some more
+
+Also known as AG13
+$1.65 for 10, $0.165 each, not bad... https://www.thebatterysupplier.com/products/lr44-battery-equivalent.html
+    We'll be using 3 per light so that's ~$0.50 each
+    Not amazing but not bad either
+Can't easily find a 3x holder for these that's flat...
+Here's 1 holder... (cylinder), https://www.dfrobot.com/product-1010.html
+Want a flower petal setup =/
+Thinking of something like this, https://www.thingiverse.com/thing:3347272
+But with battery connections
+
+Sooo maybe we should consider these 3.7V options
+Like, if we have sufficient current draw from an LIR20XX, then can we be fine with its voltage?
+
+Next step, try out a 3.7V LiPo battery with our setups (we've already got some, I'm pretty confident LIR20XX will be similar)
+
+Alright, so we're going to wedge jumper cables into our JST connector (don't have compatible size)
+
+Circuit currently is 20ohm resistors
+Will that be okay with 3.7V?
+Current LiPo voltage, 4.0V
+Can't calculate voltage or current of LED directly, only min and max for supported range
+
+If R takes full voltage, then its current is: I=V/R; 4V/20ohm = 0.2A (200mA -- limit of multimeter)
+P = IV; P=I^2*R = 0.2^2 * 20 = 0.04 * 20 = 0.8W
+Limit of resistor is prob 0.25W
+
+But we're prob fine...
+
+Red LED using up 2V
+That would leave us with
+1.7V to resistor -> P = V^2/R = 1.7^2/20 = 0.15W
+We're fine...
+
+80mA, plenty bright (seeing dots in eyes)
+I think it was actuall 100mA initially
+but there was a some current limiting going or something
+Anyway, it fucking works
+
+Flicker was prob actually multimeter, no issues when doing direct wire
+So damn bright ._.
+
+Yea, 112-116mA on full brightness, no flicker
+
+Kind of wonder if CR2032 brownouts were multimeter but I'm doubtful
+
+Looking more at LIR2450 now as a result of positive progress
+
+There are decent priced LIR2450 chargers
+https://www.ebay.com/itm/LIR2430-LIR2450-LIR2477-Coin-Cell-Button-Cell-TYPE-Battery-Charger-US-Plug-s731-/132104110511
+https://www.batterymart.com/p-ch-unce001-2450-coin-cell-charger.html
+Only question is quality of them...
+Yea, pretty scathing reviews... https://www.amazon.com/Li-ion-LIR2450-Rechargeable-Batteries-Charger/dp/B01D33A8Q6#customerReviews
+
+Oooh, we can prob charge via Adafruit charger =o
+Just need to adapt holder to have similar JST connector
+
+I do like the coin cell format
+as it has a metal shield built in
+
+Next step is prob to order LEDs/covers, batteries, and holders
+Holders need a 24mm diameter one, CR2032 is 20mm
+https://www.keyelco.com/userAssets/file/M65p9.pdf
+Wrong sizing but good info, https://www.digikey.com/product-detail/en/keystone-electronics/3034/36-3034-ND/4499289
+
+Could also possibly try cutting LEDs from existing roll but ATtiny won't be able to support that current
+i.e. ATtiny85 won't be able to provide over 40mA current -- https://components101.com/microcontroller/attiny85-pinout-datasheet
+This LED we choose should take a protocoled signal and draws from battery directly
+
+Actually, 40mA is pretty high so might be able to do it...
+Especially if RGB each take 40mA each
+
+I think the worst case is we see a brown out (or maybe overheat)
+This one says reliability, https://forum.arduino.cc/index.php?topic=62219.msg450493#msg450493
+
+I'm kind of frustrated with with our mess of cables so I don't really want to iterate with ATtiny85 until we make it more pleasant
+
+Maybe buy the following:
+- Ribbon cables
+- LIR2450
+- LIR2450 holders
+- Unsure about RGB LEDs...
+- See other tasks
+
+Standard RGB LED can be found on mouser, https://www.mouser.com/Optoelectronics/LED-Lighting/LED-Emitters/Standard-LEDs-Through-Hole/_/N-b1bc8?Keyword=rgb+led&FS=True&Ns=Pricing|0
+$1 each or more
+
+30 LED strip for $20, https://www.mouser.com/ProductDetail/Digilent/122-000?qs=sGAEpiMZZMuYNVO9ZxRTD1hQltYkRlJvil8ruQxXuOUU3ypuApXE0A%3D%3D
+
+$0.18+ for SMD LED, https://www.mouser.com/Optoelectronics/LED-Lighting/LED-Emitters/Standard-LEDs-SMD/_/N-b1bb1?Keyword=rgb+led&FS=True&Ns=Pricing|0
+
+Not many other options that apply to us on Mouser...
+
+There are some diffusers but hard to find sizing info...
+https://www.mouser.com/ProductDetail/EAO/95-804720?qs=sGAEpiMZZMvxTCYhU%252BW9mfeSDuHlEDLHtH1MPJi%252BbXY%3D
+https://www.mouser.com/ProductDetail/RAFI/572050000-0214?qs=sGAEpiMZZMuYaq4aOfOV%252BLMkCdDwPHMKegCBMrj%252BnSs%3D
+Most seem to be sized for specific parts I guess
+
+https://www.plasticballsupply.com/1-in-1-clear-acrylic-half-balls/
+We can possibly get something like this and scratch it up like LEDs?
+Unfortunately show-side will then be scratchy...
+($1/each)
+
+Ooh, maybe only scratch inside then?
+
+Much cheaper version via AliExpress, https://www.aliexpress.com/item/32970657753.html ($4.50/10)
+
+Spray paints seem to get poor reviews, prob better to stick to sandpaper
+
+Huh... these might works, they're eyes with retinas painted on
+So if we take off paint via isopropyl then we're golden
+https://www.ebay.com/i/233384723901
+
+Adafruit is $50 for 20
+That's $2.50/LED. Not bad but not great either
+https://www.adafruit.com/product/1547
+Also 12V so iffy on how much we can use them...
+
+It does say -0.3-6V power supply so unsure why 12V but yea...
+
+50mm balls :sparkles: https://www.alibaba.com/product-detail/Digital-50mm-ws2801-addressable-led-pixel_62136511601.html
+$0.80/each (200 min) for same variant as Adafruit but direct from China, https://www.alibaba.com/product-detail/full-color-addressable-waterproof-rgb-dc12v_60832151532.html
+
+Considering a DIY diffuser like: https://lumecube.com/products/silicone-diffusers-for-the-lume-cube-air
+But then again, definitely spending more that way...
+
+https://www.reddit.com/r/batteries/comments/b5vo74/can_i_use_lipo_battery_for_12v_led_strip/
+Reddit says it'll be dimmer but work fine
+
+I'm just so hesitant to spend $50 to find out it's not what I want
+Or I am going to burn a lot more power than I expect...
+
+Yea, next step:
+- Buy ribbon cables so we feel better about ATtiny development
+- Then verify LiPo + ATtiny + RGB has reasonable power consumption and brightness (e.g. lasts 10 hours before recharge)
+
+# 2020-03-19
+We should also do a visual mockup of the wall as the LED domes when off might look creepy (e.g. like a wall of security cameras)
+
+# 2020-03-24
+Ribbon cables arrived a couple days ago, finally tried them out today
+So much cleaner =3
+A little iffy on that we could accidentally reverse the order but color coding helps with that
+
+Interesting...
+Seem to be unable to program when powering off of LiPo (3.7V)
+Getting an invalid signature error
+which goes away once good voltage supplied
+Maybe it's a HIGH/LOW logic level issue
+
+White LED works great for 5V
+Getting weird flickering for 3.7V
+Guessing it's a brown out
+
+```
+// the setup function runs once when you press reset or power the board
+void setup() {
+  // initialize digital pin LED_BUILTIN as an output.
+  pinMode(0, OUTPUT);
+  pinMode(1, OUTPUT);
+  pinMode(2, OUTPUT);
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  digitalWrite(0, HIGH);   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(1, HIGH);   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(2, HIGH);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);                       // wait for a second
+  digitalWrite(0, LOW);    // turn the LED off by making the voltage LOW
+  digitalWrite(1, LOW);    // turn the LED off by making the voltage LOW
+  digitalWrite(2, LOW);    // turn the LED off by making the voltage LOW
+  delay(1000);                       // wait for a second
+}
+```
+
+Feel like we want a switch that allows toggling between:
+- Fully off (for sane programming, though unsure there's a case for it -- really need to disconnect rest of components)
+- 3.7V battery power
+- 5V USB power
+
+This means a double pole switch as we also need to toggle grounds
+
+Anyway, next step is prob use multimeter on each of the lines to see their current draw
+Then see if we're going over MCU limits
+Though since full LED was lighting up at 5V
+It's prob a battery draw issue?
+Or maybe it's a current draw on boot issue?
+I'm getting tired so pausing this for now
+
+# 2020-03-25
+Added switch to circuit board so we can seamlessly toggle between 5V USB and 3.7V LiPo
+We don't need a double pole switch as KVL doesn't kick in for a circuit with only 1 connection (needs a loop)
+
+Red and blue blink is working well for both, though 3.7V is slightly dimmer (kind of expected)
+Not doing current draw analysis yet
+
+Huh, brown-out isn't happening like it was yesterday
+and RGB LED is quite bright
+Prob 80/90% of 5V for 3.7V variant
+
+Now let's do a current draw analysis (though likely LEDs we choose for final revision will be different)
+
+Disabled blink
+Seeing 57.3mA for 3.7V
+115.5mA for 5V
+
+Curious how much is MCU vs LED for 3.7V
+Let's do inline measurements for MCU leads
+31.5mA for leftmost lead, can't tell what it is. Looks like red based on hand color projection
+10.7mA (13.5mA initlally) for green/middle
+10.0mA for blue/right
+So that's ~52.2mA for LED, 5mA for MCU
+That seems about right based on past experience
+
+Let's see what happens if we sleep MCU immediately, do we save our 5mA on power?
+
+One definite way to save power would be larger resistors for LED
+
+Strange, seem to be able to upload with 3.7V after all..
+Well, MCU sleep works. Down to 53.7mA
+
+```
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+void setup() {
+  pinMode(0, OUTPUT);
+  pinMode(1, OUTPUT);
+  pinMode(2, OUTPUT);
+
+//  PCMSK |= (1 << PCINT2); // Enable interrupt handler (ISR) for our chosen interrupt pin (PCINT1/PB1/pin 6) -- ADJUSTED
+//  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+  ADCSRA &= ~(1<<ADEN); //Disable ADC, saves ~230uA
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+}
+
+void loop() {
+  digitalWrite(0, HIGH);   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(1, HIGH);   // turn the LED on (HIGH is the voltage level)
+  digitalWrite(2, HIGH);   // turn the LED on (HIGH is the voltage level)
+
+  sleep_enable();
+  sleep_cpu();
+}
+```
+
+Also worth noting that this is full brightness, we can likely go a lot lower via PWM analog writes
+Though does that work with MCU off?
+
+Verified analog write works:
+
+```
+void loop() {
+  int val;
+  val = 255;
+  analogWrite(0, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(1, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(2, val);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);                       // wait for a second
+  val = 100;
+  analogWrite(0, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(1, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(2, val);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);
+  val = 0;
+  analogWrite(0, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(1, val);   // turn the LED on (HIGH is the voltage level)
+  analogWrite(2, val);   // turn the LED on (HIGH is the voltage level)
+  delay(1000);
+}
+```
+
+It looks like red (2) isn't dimming...
+Confirming that green and blue do (0) and (1)
+
+It turns out that pin PB2 lacks PWM support
+http://www.technoblogy.com/show?LE0
+But we can use PB3 or PB4 instead for this (those share the same timer though, as compliments)
+
+Moved to PB4 since it's not a compliment
+Toggling works =)
+```
+analogWrite(4, val);
+```
+
+Verifying they're operating on different timers (255, 255) -> (200, 100)
+
+Current draw at all 100/255 (no MCU power off)
+25.3mA
+
+With MCU power off, LED goes off too =/
+
+Right, we can do idle or ADC noise reduction sleep which allows PWM (we need an oscillator)
+https://www.re-innovation.co.uk/docs/sleep-modes-on-attiny85/
+
+Not much benefit with `SLEEP_MODE_IDLE`
+It's at 24.7mA
+
+No `EXT_STANDBY` nor `PWR_SAVE` for us - Line 178, https://www.nongnu.org/avr-libc/user-manual/sleep_8h_source.html
+
+Using a larger resistor isn't going to change much, effectively same as PWM with less control
+We'll decrease provided current to LED which in turn drops its voltage usage and resistor picks up rest via heat energy
+Prob only practical for solid color + sleep to reduce overall current draw
+
+Sooo runtime calculations, with 25mA (still plenty bright -- prob not using full red)
+and LIR2450, https://cdn-shop.adafruit.com/datasheets/LIR2450.pdf
+100mAh for sake of discussion
+That's 4 hours runtime
+Kind of a pain...
+
+Also open questions like is RGB any good with out of sync lights?
+Maybe if we boot them all really fucking quick somehow o_o
+Like IR LED to them all
+Though we've seen soundbar remote trigger those...
+
+I think the best thing to do is mock all of this up
+
+I guess 1 workaround to 120mAh would be 2x batteries sooo 200mAh roughly or 8 hours of runtime
+
+Consideration with solid color
+Prob equivalent to just green or blue which we've used before
+10mA full brightness, that's 10h on 1 battery =/ (MCU sleeping most of time due to full brightness)
+
+But anyway... mockups...
+
+https://codepen.io/twolfson/pen/eYNQZyb
+(fastest tool I can figure out for animations)
+
+```js
+const LED_COUNT = 10;
+const COLOR_PATTERNS = [
+  [200,    0,   0],
+  [   0, 200,   0],
+  [   0,   0, 200],
+];
+
+function toHexByte(num) {
+  let str = num.toString(16);
+  if (str.length === 1) {
+    return '0' + str;
+  }
+  return str;
+}
+
+for (let i = 0; i < LED_COUNT; i++) {
+  // Initialize our LED circles
+  let ledEl = document.createElement('div');
+  ledEl.className = 'led';
+  ledEl.id = `led-${i}`;
+  document.body.appendChild(ledEl);
+
+  // Start every LED separately from each other
+  setTimeout(function () {
+    // Rotate colors, once every few seconds (same for all LEDs)
+    // Accelerated rotation for easier mock
+    let colorPosition = 0;
+    function updateColor() {
+      let targetColor = COLOR_PATTERNS[colorPosition];
+      let hexColor = toHexByte(targetColor[0]) + toHexByte(targetColor[1]) + toHexByte(targetColor[2]);
+      ledEl.style.cssText = `background-color: #${hexColor}`;
+      colorPosition = (colorPosition + 1) % COLOR_PATTERNS.length;
+    }
+    updateColor();
+    setInterval(updateColor, 10e3);
+  }, 1e3 * (i + Math.random()));
+}
+```
+
+```scss
+.led {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 10px;
+  width: 10px;
+  height: 10px;
+  background-color: #000;
+}
+
+@for $i from 0 to 10 {
+  #led-#{$i} {
+    left: $i * 15px;
+  }
+}
+```
+
+It's kind of endearing, like as long as I start them from left to right
+then they have a nice chain pattern to them
+With persistence of what I did at the start following them along consistently
+So it allows for dynamic patterns
+
+We could prob program a solid color mode via switch toggling
+
+Although, in large format mode
+I prob don't want constant colors for the entire wall
+I prob want some shifting...
+Or maybe I do...
+I don't really know ._.
+
+I'll have to think about it =/
+Got plenty of time before ordering =)
+
+# 2020-05-03
+Started creating a buy list but got stuck on:
+- Potential brightness concerns
+- Double LED from single MCU concerns/workarounds
+
+Notes from last night:
+
+"""
+9 lanterns, 3? double
+Need to figure out ATtiny current for 2 LEDs
+Either switch to transistor approach (which feels overkill) -- Maybe just do it for 2 LEDs?. Let's prototype at home first...
+    Current limiter in the end is usually
+Flip-flops in 5 pin packages are only surface mount =/ https://www.digikey.com/products/en/integrated-circuits-ics/logic-flip-flops/706?k=&pkeyword=&sv=0&pv1291=400198&pv1291=405420&pv1291=405478&pv1291=405491&pv1291=405520&pv1291=248433&pv1291=249154&pv1291=249717&sf=1&FV=-8%7C706&quantity=&ColumnSort=0&page=1&pageSize=25
+    No good specs for power here... https://www.ti.com/lit/ds/symlink/sn74lvc1g80.pdf?ts=1588478756291 - 10uA drain
+     https://assets.nexperia.com/documents/data-sheet/74AHC_AHCT1G79.pdf
+I think ATtiny is nice since we can experiment still... like very slow twinkles...
+So yea, prototype with what we've got and figure it out
+...
+Realizing might have (i.e. will have) voltage drop due to transistor, ugh...
+40mA current per pin, 200mA for VCC and GND - p 161, https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf
+Pretty sure we're drawing more than 40mA but worth exploring
+...
+Drunkenly browsing Jameco electromechanical components
+Ah, we were looking for a solid state relay (SSR) -- https://www.jameco.com/Jameco/Products/ProdDS/1583041.pdf
+But this one is kind of expensive and worse current. Let's keep looking
+Hard to find concrete numbers for SSRs but really tempted to buy some and play around (comically more expensive than ATtiny ._. at least at Jameco)
+
+Might be able to get away with separate pins for 40mA (since total limitation is 200mA)
+Just have to verify sleep supports it
+
+Reed relays are also interesting but I feel like they're going to drain more power due to mechanical load
+
+Feel like I should settle on buying ATtinys
+Then a few reed relays and SSRs to experiment with
+Like we'll always have a purpose for all these components... maybe...
+
+- [optional] Perfboard - Have 6.75 of 10 perf boards, so didn't use many, feel free to buy more if you want
+- [buy] CR2032 holders - 4 CR2032 holders with 5th in tape. Buy me
+- [optional] CR2032 batteries, just nice to have spares now I guess
+- [buy] 10 ohm resistors. Have 12 of 25. Used 1x for most but 2x for double circuits, so used 12 last time. Maybe 13 but feel like 1 is for prototyping somewhere. Wattage will never go beyond what 0.25W so prob fine for 9 lanterns but maybe but more juuust in case
+- [buy] Blue, green, and white LEDs - 6 of 10 blue, 8 of 10 green, 2 of 10 white (some used for prototypes). Definitely need to buy whites, optional blue/green (why not). Maybe also RGB for good measure
+- [buy] Reed switches. Have 3 and they break a lot
+- [n] Backup button?, Use a paper clip or spare wire... It's an instant switch
+- [buy] ATTiny85, tube of 5 which I'd like to keep for prototyping/backups. Buy fresh.
+- [buy] 8 pin DIP sockets
+- [TBD] Transistor? (need to research)
+- [buy] [n, too much space] Ribbon cable headers, [y] DIP IC extractor, or [n, too expensive/single purpose (8 pin only)] IC test clip for easy reprogramming
+- [TBD] Solder? (need to research)
+- [optional] Isopropyl alcohol? Iffy on 99% being usable or hazardous
+- Small breadboards for prototyping
+- Super fancy power safety switch
+> Don't need but recording: At least 20 switches
+"""
+
+Iterating now...
+
+Here's the plan
+
+# Design 1
+Normal light, no MCU, just resistor, battery, and LED
+Just want to get baseline for brightness
+
+(V)---(R)---(LED)---GND
+
+# Design 2
+MCU inline with voltage supply
+
+Goes into sleep mode after 1s
+Maybe add a button if this is finnicky
+
+(V)---(MCU)---(R)---(LED)---GND
+       |
+       GND
+
+# Design 3
+Multiple LEDs off separate pins
+
+Intentionally underpowering off 1 battery temporarily to see how brightness if affected
+
+(V)---(MCU)---(R)---(LED)---GND
+       | \----(R)---(LED)---GND
+       |
+       GND
+
+# Design 4
+Multiple batteries for more current supply
+
+Voltages in parallel so voltage stays constant
+
+(V)---(MCU)---(R)---(LED)---GND
+(V)-/  | \----(R)---(LED)---GND
+       |
+       GND
+
+If this doesn't work, then we need to start exploring transistors
+
+# Design 5
+Combine pin outs so technically has same voltage but combines currents
+
+(V)---(MCU)---(R)---(LED)---GND
+(V)-/  | \---/   \--(LED)---GND
+       |
+       GND
+
+This might actually add unnecessary complexity for wiring since LEDs might be placed on separate sides
+
+But from a voltage supply solution, let's verify same 10 ohm gets same results
+
+Yea... KVL is the same
+Only KCL changes
+and current would be evenly split at resistor
+so only difference is R gets 2x power through it
+Still plenty...
+0.25W max, 3.3V, 80mA at most, that's 0.264W
+Oh, wow... pushing limits there ._.
+
+Well I guess we'll see what current draw is before doing that switch
+
+Okay... prototype time...
+
+# Design 1
+(V)---(R)---(LED)---GND
+
+First battery is only 2.68V with load, weird
+Yet 3.01V without...
+
+Well, LED is plenty bright
+and full load is going to LED, 2.66V
+Current in system is 1.10mA, so low ._.
+
+Alright, let's add in the MCU
+
+# Design 2
+(V)---(MCU)---(R)---(LED)---GND
+       |
+       GND
+
+Moved to blink sketch which can be tedious without good power switch
+
+Kind of tempted to build a custom circuit to switch between power sources (since those parts are often finnicky)
+Too tired to worry about it though...
+
+Seeing 0.96 to 1.04mA usage by MCU when turned on/off (not messing with sleep mode atm...)
+
+We prob should though... Ugh...
+
+Issue with reprogramming is likely overvolting LED due to MCU being 5V instead of 3.3V
+So need a double throw switch or precise order of operations...
+
+...
+
+Soo damn tired...
+
+After researching DPDT switches on Jameco though...
+
+Just move the damn MCU...
+
+Alright, now on constant HIGH for LED
+
+2.62V used by LED so barely any change ._.
+1.35mA for entire circuit
+Still plenty bright
+
+Positive news for me is even if these don't work out, then we still have:
+- Lots of LEDs, MCUs, sockets, etc
+But more importantly
+- We have boards we already built to move back to in lanterns
+
+Based on low current usage, I feel like we can get away with 2 LEDs on 1 battery but we'll see how it goes...
+Definitely 2 LEDs on 1 pin
+
+We can easily toggle on/off LEDs to see if brightness affected
+
+# Design 3
+(V)---(MCU)---(R)---(LED)---GND
+       | \----(R)---(LED)---GND
+       |
+       GND
+
+LEDs didn't dim that much to be honest
+
+Current draw is now 1.48mA which seems low...
+Expected 2mA I guess, since 2x for LED
+but yea...
+
+Let's see what voltages are
+and if we get improvements with multiple batteries
+
+2.60V for each LED, cool
+
+# Design 4
+(V)---(MCU)---(R)---(LED)---GND
+(V)-/  | \----(R)---(LED)---GND
+       |
+       GND
+
+3.0V for new battery
+LEDs feel brighter already
+
+Voltage across LEDs is... 2.65V (as expected)
+Current draw for entire circuit is... 2.60mA
+That seems much better =D
+
+Damn non-linear devices where 0.04V makes such a big difference =P
+
+Alright... so worst case wattage for resistor combination:
+3.0V (rounding up) * 5mA (doubling for safety) -> 15mW; 0.015W
+Yea, we're plenty safe to use 1 resistor
+
+# Design 5
+(V)---(MCU)---(R)---(LED)---GND
+(V)-/  | \---/   \--(LED)---GND
+       |
+       GND
+
+It is worth noting that LED got brighter when second was unplugged with additional battery
+but I guess that's kind of expected
+Limiting supply is current in this setup ironically
+
+Yep, switched over to resistor
+Nothing blew up, current draw same (2.61mA)
+Kind of harder to tell which is doing better
+
+Quickly moving LED back/forth, seems fine
+
+And 2.65V for both LEDs, yea. Good.
+
+Prob going to use 2x resistors since it's just easier from location perspective
+
+Fwiw, 1 LED with 2 batteries is 2.69V. Cool
+
+Also fwiw, lifespan of our lanterns:
+CR2032 is 235mAh typically, https://data.energizer.com/pdfs/cr2032.pdf
+1.1mA with normal LED, no MCU, so 214h, that's almost 9 days straight (8.9d)
+With MCU and 1 battery/LED,    that's 1.35mA -> 174h (72.5d)
+With MCU and 2 batteries/LEDs, that's 2.60mA -> 180h (235/2.60*2) (more/less same, maybe get a little benefit from splitting current for MCU across 2 batteries ;)
+
+Okay... really fucking tired
+Excited for static colors since it's still just as fucking good as RGB imo but less battery/current headaches
+Not to mention runtime overdraw worries
+But probably fine without it...
+
+Worth soldering up a test LED to see how brightness goes I guess too
+Maybe we can prototype on a small breadboard...
+
+# 2020-05-04
+Did our research on solder, `2020-05-04-solder-options-again.txt`
+Deciding to order now
+
+"""
+- [optional] Perfboard - Have 6.75 of 10 perf boards, so didn't use many, feel free to buy more if you want
+- [buy] CR2032 holders - 4 CR2032 holders with 5th in tape. Buy me
+- [optional] CR2032 batteries, just nice to have spares now I guess
+- [buy] 10 ohm resistors. Have 12 of 25. Used 1x for most but 2x for double circuits, so used 12 last time. Maybe 13 but feel like 1 is for prototyping somewhere. Wattage will never go beyond what 0.25W so prob fine for 9 lanterns but maybe but more juuust in case
+- [buy] Blue, green, and white LEDs - 6 of 10 blue, 8 of 10 green, 2 of 10 white (some used for prototypes). Definitely need to buy whites, optional blue/green (why not). Maybe also RGB for good measure
+- [buy] Reed switches. Have 3 and they break a lot
+- [n] Backup button?, Use a paper clip or spare wire... It's an instant switch
+- [buy] ATTiny85, tube of 5 which I'd like to keep for prototyping/backups. Buy fresh.
+- [buy] 8 pin DIP sockets
+- [n] Transistor?
+- [buy] [n, too much space] Ribbon cable headers, [y] DIP IC extractor, or [n, too expensive/single purpose (8 pin only)] IC test clip for easy reprogramming
+- [buy] Solder (lots of leaded, 0.25 x2 lead-free, should buy 30g at least)
+> Don't need but recording: Have at least 20 switches
+- [optional] Isopropyl alcohol? Iffy on 99% being usable or hazardous. Nope, it's super flammable. Avoid it
+- Small breadboards for prototyping (maybe even 1 that can fit lanterns for RGB prototyping? (e.g. brightness))
+- Super fancy power safety switch
+- Multimeter mini-grabbers?
+- Double pole double throw switch, https://www.jameco.com/z/AS2DG-PC-TE-Connectivity-Switch-slide-Double-Pole-Double-Throw-On-None-On-PC-Mount-PC-Terminal-0-4A-20-VAC-DC_2182442.html  - https://www.jameco.com/shop/StoreCatalogDrillDownView?rf=1&history=wki7z5ih%7CfreeText%7Edpdt%5Esearch_type%7Ejamecoall%5EprodPage%7E25%5Epage%7ESEARCH%252BNAV%40rzri54w0%7Ccategory%7E3540%5EcategoryName%7Ecat_35%5Eposition%7E1%5Erefine%7E1%5EsubCategoryName%7EElectromechanical%2B%252F%2BSwitches%5EprodPage%7E25%5Epage%7ESEARCH%252BNAV&sort_field=Price+%28Ascending%29&position=1&refine=1&langId=-1&catalogId=10001&storeId=10001
+    Look at dimensional drawing for ATtiny85. Its DIP pins work really well on breadboard
+- Voltmeter or ammeter? Since swapping leads around is tedious...
+- Soldering iron tip?
+"""
+
+...
+
+We've finished an exhausting purchase order but it's done
+
+"""
+Lantern upgrades:
+9 lanterns, 3? double. Assume 15 lights + batteries + resistors for sake of planning/replacement (would be 12-13 with 3-4 doubles)
+- [n, optional] Perfboard - Have 6.75 of 10 perf boards, so didn't use many, feel free to buy more if you want (Adafruit, $5 for 10, 7x9cm (2.8x3.5") single sided Bakelite, https://www.adafruit.com/product/2670) - Pricing is pretty bad on Jameco... Can get much better pricing on Amazon or eBay.... Going to punt on this for now. Plus we can always make a dead bug variant on cardboard
+    Price is pretty good on MdFly ($7/10) - https://www.mdfly.com/products/5pcs-hq-7-9cm-single-side-prototype-board-perforated-2-54mm-plated-breadboard.html 
+- [15, buy] CR2032 holders - 4 CR2032 holders with 5th in tape. Buy me. Will need at least 
+    - Option between 2 top-loaders, both seem good enough. Slightly more expesive one has better bottom contact but meh
+     https://www.jameco.com/z/17002-00603-PC-Mount-CR2032-Coin-Cell-Battery-Holder_355434.html 
+     https://www.jameco.com/z/BS2032-1-Single-Coin-Cell-Battery-Holder-for-CR2032-or-CR2025_2280143.html 
+- [n, optional] CR2032 batteries, just nice to have spares now I guess
+    - $0.79 @ 1, $0.69 @ 10, https://www.jameco.com/z/CR2032-Renata-Batteries-CR2032-Lithium-Battery-3V-225mAh_14162.html 
+    - $0.32 @ 1, $0.26 @ 10 for name brand Panasonic on DigiKey, https://www.digikey.com/products/en/battery-products/batteries-non-rechargeable-primary/90?FV=-8%7C90&quantity=0&ColumnSort=1000011&page=1&k=cr2032&pageSize=25 
+    - $0.38 @ 10 via eBay, uncertain of freshness but prob good, https://www.ebay.com/itm/FRESH-NEW-10-Pc-Genuine-Panasonic-CR2032-Lithium-Battery-3V-Coin-Cell-Exp-2026/162994082805 
+- [20, buy] 10 ohm resistors. Have 12 of 25. Used 1x for most but 2x for double circuits, so used 12 last time. Maybe 13 but feel like 1 is for prototyping somewhere. Wattage will never go beyond what 0.25W so prob fine for 9 lanterns but maybe but more juuust in case
+- [x, buy] Blue, green, and white LEDs - 6 of 10 blue, 8 of 10 green, 2 of 10 white (some used for prototypes). Definitely need to buy whites, optional blue/green (why not). Maybe also RGB for good measure
+     Existing info: https://www.amazon.com/gp/product/B01AUI4VSI/ 
+     Also recorded in `datasheets`
+    - [x] Blue, 455-465nm, 7k-8kmcd
+          Options are [...], 6kmcd (465nm and 470nm), 12kmcd (470nm only)
+          Buying 6 of each (feel like 12kmcd is better choice but let's see how they play in person... cheap enough)
+          > Found a visualizer after seeing YouTube video for green, https://calistry.org/calculate/wavelengthVisibleSpectrum 
+          5nm negligible here imo
+          Ditching 6kmcd, somehow $1/ea vs $0.40/ea (for 12kmcd) and we've got plenty of blues from last purcase
+          Settling on 10 for roundness...
+    - [x] Green,  515nm-520nm + 15k-18kmcd
+         Options are [...], 11kmcd (510nm), 12kmcd (515nm), 18kmcd (530nm)
+          > 530nm is closer to blue-green than green, https://www.youtube.com/watch?v=wxil71mcKpU 
+          Really do want a 510-520nm =/
+          Not buying any... we've got plenty from last time which are brightest...
+          Eh, maybe but 12mkcd s owe fit into brightness ranges
+          Going with 4 green
+    - [x] White, 6000K-9000K (7000K-8000K) + 12k-18kmcd
+          Options are [...], 11kmd, 22kmcd, 23.5kmcd, 60kmcd
+          Going to go with 11kmcd since it's more subdued and we want more colors than not
+          Going to buy super brights just to see the difference
+    - [x] RGB
+          Brightest is 5000/9000/6000 (RGB) mcd ._. https://www.jameco.com/shop/ProductDisplay?catalogId=10001&langId=-1&storeId=10001&productId=2228957 
+          Picking up 6 for experimentation (curious if ones we already have are same)
+- [x alt site, buy] Reed switches. Have 3 and they break a lot
+    $9 for 10, not a great price on Jameco... https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?storeId=10001&langId=-1&catalogId=10001&pa=2208817&productId=2208817
+    Exploring eBay options...
+    $5.50 for 10, so we can get 20 easy, works for me =D https://www.ebay.com/itm/10x-Pcs-REED-SWITCH-2X14MM-GLASS-Normally-Open-N-O-Low-Voltage-Current/391717168623?hash=item5b3429a5ef:g:fZsAAOSwAHtc3nWG 
+- [n] Backup button?, Use a paper clip or spare wire... It's an instant switch
+- [12, buy] ATTiny85, tube of 5 which I'd like to keep for prototyping/backups. Buy fresh.
+- [20, buy] 8 pin DIP sockets - Finding out style we like is called dual wipe (prob due to double sided springs)
+- [n] Transistor?
+- [1, buy] [n, too much space] Ribbon cable headers, [y] DIP IC extractor, or [n, too expensive/single purpose (8 pin only)] IC test clip for easy reprogramming
+- [2, buy] Solder (lots of leaded, 0.25 x2 lead-free, should buy 30g at least) - Some decent alternatives on eBay but trust Jameco more
+> Don't need but recording: Have at least 20 switches
+- [n, optional] Isopropyl alcohol? Iffy on 99% being usable or hazardous. Nope, it's super flammable. Avoid it
+- [x alt site] Small breadboards for prototyping (maybe even 1 that can fit lanterns for RGB prototyping? (e.g. brightness))
+- [n] Super fancy power safety switch
+- [n] Multimeter mini-grabbers?
+- [2, though won't work with DIP] Double pole double throw switch, https://www.jameco.com/z/AS2DG-PC-TE-Connectivity-Switch-slide-Double-Pole-Double-Throw-On-None-On-PC-Mount-PC-Terminal-0-4A-20-VAC-DC_2182442.html  - https://www.jameco.com/shop/StoreCatalogDrillDownView?rf=1&history=wki7z5ih%7CfreeText%7Edpdt%5Esearch_type%7Ejamecoall%5EprodPage%7E25%5Epage%7ESEARCH%252BNAV%40rzri54w0%7Ccategory%7E3540%5EcategoryName%7Ecat_35%5Eposition%7E1%5Erefine%7E1%5EsubCategoryName%7EElectromechanical%2B%252F%2BSwitches%5EprodPage%7E25%5Epage%7ESEARCH%252BNAV&sort_field=Price+%28Ascending%29&position=1&refine=1&langId=-1&catalogId=10001&storeId=10001 
+    Look at dimensional drawing for ATtiny85. Its DIP pins work really well on breadboard
+- [n] Voltmeter or ammeter? Since swapping leads around is tedious...
+    Need to buy self-powered device, otherwise we're stealing current from circuit like here (see how it requires 3V, prob due to its own LEDs): https://www.mdfly.com/products/mini-3-30v-dc-3-digit-led-voltage-meter-2-wire-blue.html 
+- [n] Soldering iron tip?
+
+Price breakdown:
+Jameco:
+Solder - $6 (30g)
+CR2032 holders - $11 (20, overkilling due to large battery count and frequent usage)
+Resistors - $1 (20) -> Changing to 30 to refill used up resistors
+LEDs, practical - White ($4, 10), Blue ($4, 10), Green ($3, 4)
+LEDs, fun - White ($1, 2), White, ($2, 2), RGB ($2, 6)
+ATtiny - $21 (12) ($1.75 each -- $1.20 on DigiKey would be $14.40 instead/25 for $27.50 (price break))
+    Solid state relays aren't much cheaper -- $1.55 at low end...
+     https://www.jameco.com/z/PIC12F629-I-P-Microchip-Technology-IC-PIC12F629-MCU-8-Bit-Flash-Based-RISC-8-pin-DIP_223790.html 
+    There's an MCU which is $0.89 after 10, apparently even lower power mode
+    Now there's a 40nA option on 18313 and 18323 @_@, https://ww1.microchip.com/downloads/en/DeviceDoc/40001799F.pdf 
+    PIC looks super promising with 1nA on some options https://www.jameco.com/Jameco/Products/ProdDS/223790.pdf
+    However, we've realized that our programmer is for AVR, not PIC so we can't just swap in...
+    Yea... programmer looks different... https://www.microchip.com/forums/m945665.aspx 
+    Passing for today but will definitel come back another time
+ATtiny socket - $2 (20)
+DIP extractor tool - $3 (1)
+Double switches - $1 (2)
+
+MdFly:
+Mini breadboards - $2 (2)
+Reed switches (some plastic) - $10 (20)
+Perfboard - $7 (10)
+
+Yea, I feel pretty good about this order...
+
+Sanity check:
+- CR2032 holder, yep
+- Solder, yep
+- Reed switches, yep
+- MCU, yep
+- MCU socket, yep
+- Resistors, yep
+- LEDs, yep
+
+I am getting double damage on shipping ($5 each) but we're not getting a better deal on perfboard any time soon
+Actually, let's grab some more... maybe some double sided...
+"""
+
+Huh, Jameco is being weird and not letting me view order history eagerly to confirm resistor count...
+Oh well, we're fine eithre way
+
+# 2020-05-05
+Yep, saved this file at 5:20AM and didn't get email until 5:25AM so it had to be prob 10 min (assuming we didn't immediately update this file, putting it at 5:15AM submission)
+
+It looks like the resistor count update didn't stick sadly =/
+Called them (was told it wasn't possible over chat), was able to add the promo code retroactively (just made the cutoff)
+but the order had already been picked
+
+# 2020-05-17
+Parts arrived last week, very quickly from Jameco
+Sanitizied any non-sealed/non-prepacked packages
+Left for 1 week for just in case (not in a rush)
+Going to wire things up today
+
+Here's our plan:
+
+"""
+Breadboard out circuit one more time, using new mini ones
+Also sorts out code and any magnet issues (can debounce in code if needed)
+
+Review sanding notes for LEDs
+
+Solder up a small board
+
+Solder up a big board to figure out if we need to split it somehow or not. Still can do dead bug
+
+Complete the other 7 boards
+"""
+
+Started with blink sketch and basic breadboard
+Works great =D
+
+Verified socket works too, though doesn't want to cooperate as nicely on breadboard (just like battery)
+
+Next up to copy/paste reuse sleep/interrupt code
+And sanity check power usage
+
+We forgot about the pull-down resistor
+We have unstable behavior without an external resistor currently
+But feel like we're missing something that can allow using `INPUT_PULLUP` and we were rushing through it last time
+
+Looking at diagram, we're supports to connect to GND to toggle
+Interesting...
+Let's seee...
+https://www.arduino.cc/en/Tutorial/InputPullupSerial
+
+Yep, that works =)
+
+Put into breadboard application
+It fucking works =D
+And no flicker =D
+
+Current draw:
+Off: 0.1uA
+On: 5.6mA for green LED
+Sooo fucking good =3
+
+Notes for self on each board:
+- LED should stand off taller than CR2032 holder so light can fully diffuse
+    - This means vice is critical so we can solder upside-down
+- Don't cover up DIP socket with reed switch like we did in demo
+- Sand LEDs with 400 grit sandpaper, https://github.com/twolfson/lantern-wall/blob/2018.1019.0412/2018-04-15-making-boards.txt#L193
+    - Wet sandpaper is key
+- Cut board edges with scissors and sand corners for appearance, prob used only 60-100 grit for this...
+- Cover bottom of board with white duct tape
+    - For larger board setups, TBD -- we had split board for those but we're set on using the colors we chose this time... (could put in headers I guess but meh, didn't want to color swap for 2 years, no desire to now either)
+
+One small board down
+It wound up being a little longer due to lots of stacking off of the GND pin
+    We had the pin itself, reed switch, resistor, and wire from the battery
+Fits into small lantern just fine
+Might have made it too tall as a result of being so long but unsure much else I can do or if that's just how it's always been
+I did try to shorten down its LED which helped a little
+Eh, good enough =)
+
+...
+
+Much later
+Big board took a lot longer than expected
+LED sanding takes a bit
+Had soldering issues with a battery connector
+Was taking a while to get jumper wires and layout right
+Broke a reed switch (damn glass) but that was a rather quick replacement
+Finally had continuity issues between MCU connections
+I believe it took 2 hours which is ridiculous ._.
+
+I think there was also a contributing factor of spacing out the LEDs
+but that might just be the nature of good light spread
+
+# 2020-05-18
+Did some Fritzing last night to get nicer layouts
+which should also mean less thinking while wiring up a board =)
+
+Tried out LEDs today, should have tried them out earlier =/
+The white LEDs we bought are much more warm-white than white =/ or at least have distinct wavelengths
+
+Prob going to buy replacement LEDs and try to get by until then
+
+...
+
+Completed another board, only took 1h15min this time (6:30PM-7:45PM)
+Fritzing helped a lot
+We did botch the wiring to/front GND (ran from VCC instead x_x)
+
+It was a little difficult to work with all the components so tightly packed though =/
+
+It'll be a pain to maintain that board...
+
+I do think it's funny that we got the components soldered in in first 10min
+It's really the traces/jumper wires that take a while
+So PCB are a nice consideration for the future I guess, just so expensive for what they are ._.
+
+...
+
+Last big board down, only took 30 min apparently (12:30AM-1:00AM)
+Didn't have LEDs for it but used permanent marker to do layout
+and ran jumper traces across back which helps a lot with cables and fighting for space
+Also spaced out LED leads and reed switch by 1 row each to breath as well =)
+Very happy camper
+
+Small board took a while, apparently 1.5h but feel like that's wrong...
+We were playing Tetris to figure out placement though =/
+
+Just completed another board after refreshing small lantern layout to avoid pin fighting
+Timed it at 20min =D
+So new layout helps a lot!
+Also only needed 1 jumper wire for VCC since we discovered we could use looong resistor lead for battery GND =D
+
+15min for one without LEDs ._.
+But then 30 minutes to fix the AVR programmer whose socket got less functional over time
+(now with hackishly replaced socket as we couldn't desolder old vias for some reason =_=
