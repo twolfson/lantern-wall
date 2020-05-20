@@ -241,6 +241,10 @@ Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be fou
 
 > Using Fritzing after our first couple boards significantly sped up production since we didn't have to overthink placement as much
 
+![Fritzing layout](2020-05-magnet-toggle-layout.png)
+
+![Board result](2020-05-magnet-toggle-board.jpg)
+
 [Arduino]: https://www.arduino.cc/
 [Fritzing]: https://fritzing.org/home/
 
