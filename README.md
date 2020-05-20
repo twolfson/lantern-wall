@@ -235,7 +235,7 @@ We were also excited about features like:
 
 We prototyped and created new boards with this setup, detailed info can be found in `2020-05-magnet-toggle.txt`
 
-Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be found in the corresponding `2020-05-magnet-toggle` folder
+Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be found in the corresponding `magnet-toggle` folder
 
 > Using Fritzing after our first couple boards significantly sped up production since we didn't have to overthink placement as much
 
