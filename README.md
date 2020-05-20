@@ -211,6 +211,32 @@ We did some research and settled on the following triggering our lanterns:
 
 We can now slide in/out the bar magnet on the bottom of the lantern which is marginally easier and still consumes no power
 
+## May 2020
+After enough time, we found inserting/removing magnets each time was tedious to do for all 9 boards
+
+We considered many alternatives (e.g. pull cord switch, solid-state relays)
+
+We settled on using an [ATtiny85][] for the following reasons:
+
+- Through-hole solid-state relays seemed to draw more current in quiescent state (ATtiny @ 3.3V is 0.1uA, relays were at least 1uA)
+    - Example: https://www.digikey.com/product-detail/en/toshiba-semiconductor-and-storage/TLP222AF/TLP222AF-ND/871243
+    - Battery is only 200mAh so 2 years of idling is 6mAh
+> 0.1uA * 1mA/1000uA * 60s * 60m * 24h * 365d * 2y = 6307mAh...
+> Uhhh, I think we never adjusted for mAh vs Ah x_x
+- Easy wiring with built-in pull-up resistor for interrupt
+- Already had programmer for it, we saw `PIC12F629` allows for 1nA current on sleep
+    - https://www.jameco.com/Jameco/Products/ProdDS/223790.pdf
+
+We were also excited about features like:
+
+- Keeping LED on while ATtiny is asleep (only works for `digitalWrite`/`HIGH`, no `analogWrite`/PWM support)
+- Potential to use for twinkling (contrary to previous line)
+- Potential to use for RGB LEDs, once we more thoroughly learn about power requirements and battery options
+
+[ATtiny85]: https://www.microchip.com/wwwproducts/en/ATtiny85
+
+
+
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
 
