@@ -1,3 +1,8 @@
+// Based on
+//   https://learn.sparkfun.com/tutorials/h2ohno#low-power-attiny
+//   https://www.instructables.com/id/ATtiny85-Interrupt-Barebones-Example/
+//   http://www.technoblogy.com/show?KX0
+//   https://forum.arduino.cc/index.php?topic=524949.msg3580423#msg3580423
 // Load in our dependencies
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
