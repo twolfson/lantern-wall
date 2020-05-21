@@ -241,6 +241,24 @@ Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be fou
 
 > Using Fritzing after our first couple boards significantly sped up production since we didn't have to overthink placement as much
 
+Bill of Materials (BOM) per 1 LED board:
+
+- 7x9cm single sided perfboard, $0.75 each, https://www.mdfly.com/products/5pcs-hq-7-9cm-single-side-prototype-board-perforated-2-54mm-plated-breadboard.html
+    - Can use a much smaller size in practice and pad out edges with cardboard underneath
+- 8 pin DIP socket, $0.12 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=51571
+    - Kind of sticky to microcontrollers, recommend buying [DIP IC extractor](https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=16838) as well
+- ATtiny85, $1.75 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=2151312
+- CR2032 holder, $0.55 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=355434
+    - These were much less brittle than the earlier versions we bought, very satisfied
+- Reed switch - normally open, $0.50 each, https://www.mdfly.com/products/hq-2-7x14mm-reed-switch-no-pack-of-2.html
+    - Highly recommend plastic over glass as glass can break easily during handling
+- LEDs, $0.40 at most each
+    - White, failed to get right brightness+color temperature from Jameco, went back to Chanzon, https://smile.amazon.com/gp/product/B01AUI4VSI/
+    - Green, leftover from first iteration, https://smile.amazon.com/gp/product/B01AUI4VSI/
+    - Blue, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=2274839
+- 10 ohm resistor, $0.06 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=690380
+- Not listed: Solid core wire, solder, etc
+
 ![Fritzing layout](2020-05-magnet-toggle-layout.png)
 
 ![Board result](2020-05-magnet-toggle-board.jpg)
