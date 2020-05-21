@@ -264,7 +264,7 @@ Bill of Materials (BOM) per 1 LED board:
     - Green, leftover from first iteration, https://smile.amazon.com/gp/product/B01AUI4VSI/
     - Blue, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=2274839
 - 10 ohm resistor, $0.06 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=690380
-- Not listed: Solid core wire, solder, etc
+- Not listed: Solid core wire, solder, CR2032 battery, etc
 
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
