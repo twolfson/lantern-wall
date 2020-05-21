@@ -241,6 +241,13 @@ Additionally an [Arduino][] sketch and perfboard [Fritzing][] layouts can be fou
 
 > Using Fritzing after our first couple boards significantly sped up production since we didn't have to overthink placement as much
 
+![Fritzing layout](2020-05-magnet-toggle-layout.png)
+
+![Board result](2020-05-magnet-toggle-board.jpg)
+
+[Arduino]: https://www.arduino.cc/
+[Fritzing]: https://fritzing.org/home/
+
 Bill of Materials (BOM) per 1 LED board:
 
 - 7x9cm single sided perfboard, $0.75 each, https://www.mdfly.com/products/5pcs-hq-7-9cm-single-side-prototype-board-perforated-2-54mm-plated-breadboard.html
@@ -258,13 +265,6 @@ Bill of Materials (BOM) per 1 LED board:
     - Blue, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=2274839
 - 10 ohm resistor, $0.06 each, https://www.jameco.com/webapp/wcs/stores/servlet/ProductDisplay?langId=-1&storeId=10001&catalogId=10001&productId=690380
 - Not listed: Solid core wire, solder, etc
-
-![Fritzing layout](2020-05-magnet-toggle-layout.png)
-
-![Board result](2020-05-magnet-toggle-board.jpg)
-
-[Arduino]: https://www.arduino.cc/
-[Fritzing]: https://fritzing.org/home/
 
 ## Unlicense
 As of Apr 29 2018, Todd Wolfson has released this repository and its contents to the public domain.
