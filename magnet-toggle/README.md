@@ -43,3 +43,4 @@ As well as document our setup itself as code (e.g. clock speed, fuses)
 
 ## Notes
 - Starting point for current code: 0.2uA LED off, 1.67mA LED on
+- We tried downclocking it but have bricked it .\_. https://www.avrfreaks.net/forum/attiny85-configured-128-khz-internal-oscillator-does-not-program-anymore
