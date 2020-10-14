@@ -40,3 +40,6 @@ Please see the [Fritzing][] files (`.fzz`) for wiring layout
 We use PlatformIO for our project, to avoid dancing between different Arduino IDE setups
 
 As well as document our setup itself as code (e.g. clock speed, fuses)
+
+## Notes
+- Starting point for current code: 0.2uA LED off, 1.67mA LED on
