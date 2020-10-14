@@ -4,6 +4,7 @@
 //   http://www.technoblogy.com/show?KX0
 //   https://forum.arduino.cc/index.php?topic=524949.msg3580423#msg3580423
 // Load in our dependencies
+#include <Arduino.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
