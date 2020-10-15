@@ -38,7 +38,7 @@ void setup() {
 
   // Configure interrupts (p48+)
   GIMSK |= (1 << INT0); // Enable INT0 interrupt
-  MCUCR |= (1 << ISC01) | (1 << ISC00); // Only trigger INT0 interrupt on rising edge
+  // In power-down mode, no edges, only level interrupt for INT0 (p34) so no MCUCR config
 
   // Configure sleep
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
