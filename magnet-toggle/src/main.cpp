@@ -64,7 +64,7 @@ void loop() {
 ISR(INT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
   // TODO: Also prob use the register for this
-  if (digitalRead(INT0_PIN) == HIGH) {
+  if (GIFR & (1 << INTF0) == (1 << INTF0)) {
     ledState = !ledState;
     digitalWrite(LED_PIN, ledState);
   }
