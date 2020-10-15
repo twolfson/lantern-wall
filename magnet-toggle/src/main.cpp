@@ -17,7 +17,6 @@
 int ledPin = PB0; // Same as built-in programmer board for ease of use
 int interruptPin = PB2; // INT0 pin, but INT0 is "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
   // https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h#L346
-  // TODO: Why doesn't `INT0` work? What is the value of `PB2`? Is it 7 like in the diagram?
 bool ledState = LOW;
 
 void setup() {
