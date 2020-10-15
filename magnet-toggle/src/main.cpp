@@ -16,7 +16,7 @@
 
 // Set up our constants
 #define LED_PIN PB0 // Same as built-in programmer board for ease of use
-#define INTERRUPT_PIN PB2 // INT0 pin, but INT0 is "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
+#define INT0_PIN PB2 // Would use INT0 but that's "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
   // https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h#L346
 
 // Set up our global variables
@@ -28,7 +28,7 @@ void setup() {
   static_assert(PB0 == LED_PIN, "Expected LED_PIN to be PB0");
   pinMode(PB0, OUTPUT);
   pinMode(PB1, INPUT_PULLUP);
-  static_assert(PB2 == INTERRUPT_PIN, "Expected INTERRUPT_PIN to be PB2");
+  static_assert(PB2 == INT0_PIN, "Expected INT0_PIN to be PB2");
   // DEV: Interrupt pin is now set to trigger when shorted to GND, otherwise would need pull-down resistor with VCC
   //   See Fritzing schematic for clarification
   pinMode(PB2, INPUT_PULLUP);
@@ -36,10 +36,10 @@ void setup() {
   pinMode(PB4, INPUT_PULLUP);
   pinMode(PB5, INPUT_PULLUP);
 
-  // Configure interrupt/sleep
-  PCMSK |= (1 << INTERRUPT_PIN); // Enable interrupt handler (ISR) for our chosen interrupt pin
-  GIMSK |= (1 << INT0); // Enable PCINT interrupt in the general interrupt mask
-  // GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+  // Configure interrupts (p48+)
+  GIMSK |= (1 << INT0); // Enable INT0 interrupt
+
+  // Configure sleep
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
@@ -64,7 +64,7 @@ ISR(INT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
   // TODO: See if we can determine a rising/falling edge
   // TODO: Also prob use the register for this
-  if (digitalRead(INTERRUPT_PIN) == HIGH) {
+  if (digitalRead(INT0_PIN) == HIGH) {
     ledState = !ledState;
     digitalWrite(LED_PIN, ledState);
   }
