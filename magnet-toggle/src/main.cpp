@@ -39,7 +39,6 @@ void setup() {
   // Configure interrupts (p48+)
   GIMSK |= (1 << INT0); // Enable INT0 interrupt
   // In power-down mode, no edges, only level interrupt for INT0 (p34) so no MCUCR config
-  SREG |= (1 << SREG_I);
 
   // Configure sleep
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
@@ -64,10 +63,8 @@ void loop() {
 //   These come from table on p48 of datasheet
 ISR(INT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
-  // TODO: Also prob use the register for this
-  if (GIFR & (1 << INTF0) == (1 << INTF0)) {
+  if (digitalRead(INT0_PIN) == HIGH) {
     ledState = !ledState;
     digitalWrite(LED_PIN, ledState);
-    delay(1000);
   }
 }
