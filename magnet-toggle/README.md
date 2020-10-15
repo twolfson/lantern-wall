@@ -36,6 +36,20 @@ Please see the [Fritzing][] files (`.fzz`) for wiring layout
 
 [Fritzing]: https://fritzing.org/home/
 
+## Documentation
+### Development
+If rewriting the script, then we recommend doing all dev on the programmer itself:
+
+- Connect jumper wires to interrupt pin and power, then connect them to simulate a switch closing
+
+If doing more detailed exercises like determining power usage, then V_CC will need to be proxied somehow which cannot be done in place
+
+As a reminder: A 3.3V powered ATtiny cannot be powered by a 5V USB jumper, not only due to being on a different V_CC and GND but also due to different logic levels
+
+Additionally, using 5V power with an LED might cause burnout, if the resistor is too weak
+
+In short, it's probably best to build a development board which has a resistor sturdy enough for 5V and headers for jumping everything from the programmer board (including a V_CC proxy)
+
 ## Architecture
 We use PlatformIO for our project, to avoid dancing between different Arduino IDE setups
 
