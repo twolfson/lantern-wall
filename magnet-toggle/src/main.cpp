@@ -39,6 +39,7 @@ void setup() {
   // Configure interrupts (p48+)
   GIMSK |= (1 << INT0); // Enable INT0 interrupt
   // In power-down mode, no edges, only level interrupt for INT0 (p34) so no MCUCR config
+  SREG |= (1 << SREG_I);
 
   // Configure sleep
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
@@ -67,5 +68,6 @@ ISR(INT0_vect) {
   if (GIFR & (1 << INTF0) == (1 << INTF0)) {
     ledState = !ledState;
     digitalWrite(LED_PIN, ledState);
+    delay(1000);
   }
 }
