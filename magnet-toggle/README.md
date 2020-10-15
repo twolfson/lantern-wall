@@ -40,7 +40,7 @@ Please see the [Fritzing][] files (`.fzz`) for wiring layout
 ### Development
 If rewriting the script, then we recommend doing all dev on the programmer itself:
 
-- Connect jumper wires to interrupt pin and power, then connect them to simulate a switch closing
+- Connect jumper wires to interrupt pin (PB2) and GND, then connect them to simulate a switch closing
 
 If doing more detailed exercises like determining power usage, then V_CC will need to be proxied somehow which cannot be done in place
 
