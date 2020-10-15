@@ -1,6 +1,8 @@
 # lantern-wall/magnet-toggle
 Magnet toggle source code for a lantern wall lantern
 
+TODO: See TODOs
+
 ## Getting started
 **Requirements:**
 
