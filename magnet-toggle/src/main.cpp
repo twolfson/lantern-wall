@@ -24,10 +24,17 @@ bool ledState = LOW;
 
 // Define our functions
 void setup() {
-  pinMode(LED_PIN, OUTPUT);
+  // Set all pin modes, with default of INPUT_PULLUP to preserve power (p57)
+  static_assert(PB0 == LED_PIN, "Expected LED_PIN to be PB0");
+  pinMode(PB0, OUTPUT);
+  pinMode(PB1, INPUT_PULLUP);
+  static_assert(PB2 == INTERRUPT_PIN, "Expected INTERRUPT_PIN to be PB2");
   // DEV: Interrupt pin is now set to trigger when shorted to GND, otherwise would need pull-down resistor with VCC
   //   See Fritzing schematic for clarification
-  pinMode(INTERRUPT_PIN, INPUT_PULLUP);
+  pinMode(PB2, INPUT_PULLUP);
+  pinMode(PB3, INPUT_PULLUP);
+  pinMode(PB4, INPUT_PULLUP);
+  pinMode(PB5, INPUT_PULLUP);
 
   // Configure interrupt/sleep
   PCMSK |= (1 << INTERRUPT_PIN); // Enable interrupt handler (ISR) for our chosen interrupt pin
