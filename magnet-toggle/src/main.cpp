@@ -42,8 +42,17 @@ void setup() {
   // DEV: Technically in this mode, INT0 seems identical to PCINT*
 
   // Configure sleep
+  // TODO: Understand sleep mode, sleep enable, and sleep cpu
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+
+  // TODO: Minimize power consumption (p36, 7.4)
+  // ADC
+  // Analog comparator
+  // BOD
+  // Internal voltage reference
+  // Watchdog timer
+  // Port pins
 
   // Set up our default LED state
   digitalWrite(LED_PIN, ledState);
