@@ -8,9 +8,15 @@
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
+// Reference to constants
+// https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/io.h#L385-L386
+// ATtiny25/45/85 vars: https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h
+// ATtiny85 specific vars: https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotn85.h
+
 // Set up our constants
 int ledPin = PB0; // Same as built-in programmer board for ease of use
-int interruptPin = PB2; // INT0 pin
+int interruptPin = PB2; // INT0 pin, but INT0 is "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
+  // https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h#L346
   // TODO: Why doesn't `INT0` work? What is the value of `PB2`? Is it 7 like in the diagram?
 bool ledState = LOW;
 
@@ -22,7 +28,8 @@ void setup() {
 
   // Configure interrupt/sleep
   PCMSK |= (1 << interruptPin); // Enable interrupt handler (ISR) for our chosen interrupt pin
-  GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
+  GIMSK |= (1 << INT0); // Enable PCINT interrupt in the general interrupt mask
+  // GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
@@ -43,7 +50,9 @@ void loop() {
 // DEV (pretty confident): PCINT0_vect is pin change interrupt request which is unrelated to INT0 interrupt
 //   We cannot use this vector due to it being disabled in power-down, see 7.1 in datasheet, page 34
 // TODO: Understand why `INT0_vect` doesn't work...
-ISR(PCINT0_vect) {
+//   https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h#L365
+//   These come from table on p48 of datasheet
+ISR(INT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
   if (digitalRead(interruptPin) == HIGH) {
     ledState = !ledState;
