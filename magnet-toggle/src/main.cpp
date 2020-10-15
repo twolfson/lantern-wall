@@ -14,26 +14,29 @@
 // ATtiny85 specific vars: https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotn85.h
 
 // Set up our constants
-int ledPin = PB0; // Same as built-in programmer board for ease of use
-int interruptPin = PB2; // INT0 pin, but INT0 is "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
+#define LED_PIN PB0 // Same as built-in programmer board for ease of use
+#define INTERRUPT_PIN PB2 // INT0 pin, but INT0 is "6" (bit in GIMSK (interrupt register)) when we need "2" for pin
   // https://github.com/vancegroup-mirrors/avr-libc/blob/06cc6ff5e6120b36f1b246871728addee58d3f87/avr-libc/include/avr/iotnx5.h#L346
+
+// Set up our global variables
 bool ledState = LOW;
 
+// Define our functions
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
   // DEV: Interrupt pin is now set to trigger when shorted to GND, otherwise would need pull-down resistor with VCC
   //   See Fritzing schematic for clarification
-  pinMode(interruptPin, INPUT_PULLUP);
+  pinMode(INTERRUPT_PIN, INPUT_PULLUP);
 
   // Configure interrupt/sleep
-  PCMSK |= (1 << interruptPin); // Enable interrupt handler (ISR) for our chosen interrupt pin
+  PCMSK |= (1 << INTERRUPT_PIN); // Enable interrupt handler (ISR) for our chosen interrupt pin
   GIMSK |= (1 << INT0); // Enable PCINT interrupt in the general interrupt mask
   // GIMSK |= (1 << PCIE); // Enable PCINT interrupt in the general interrupt mask
   ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   // Set up our default LED state
-  digitalWrite(ledPin, ledState);
+  digitalWrite(LED_PIN, ledState);
 }
 
 void loop() {
@@ -53,8 +56,8 @@ void loop() {
 //   These come from table on p48 of datasheet
 ISR(INT0_vect) {
   // If our interrupt occurred on a rising edge (this runs on both rising and falling), then toggle our LED
-  if (digitalRead(interruptPin) == HIGH) {
+  if (digitalRead(INTERRUPT_PIN) == HIGH) {
     ledState = !ledState;
-    digitalWrite(ledPin, ledState);
+    digitalWrite(LED_PIN, ledState);
   }
 }
