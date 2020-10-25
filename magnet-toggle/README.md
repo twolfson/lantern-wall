@@ -60,3 +60,6 @@ As well as document our setup itself as code (e.g. clock speed, fuses)
 - We tried downclocking it but have bricked the ability to program it .\_. https://www.avrfreaks.net/forum/attiny85-configured-128-khz-internal-oscillator-does-not-program-anymore
   - The ATtiny85 still does work for our lanterns, but yea. Stuck at unable to program =/
   - Going to put it off to the side
+- Moved to newer code and fuses, seems to use same 0.1uA when LED off but 1.90mA with LED on
+- Rolled back code and fuses, power consumption is indistinguishable (only real changes were analog comparator disable and pins change)
+  - Though couldn't turn on LED in 200uA multimeter mode with new code/fuses. Possibly requires CKDIV8 for slower/less power hungry boot
