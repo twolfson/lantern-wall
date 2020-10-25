@@ -64,3 +64,4 @@ As well as document our setup itself as code (e.g. clock speed, fuses)
 - Rolled back code and fuses, power consumption is indistinguishable (only real changes were analog comparator disable and pins change)
   - Though couldn't turn on LED in 200uA multimeter mode with new code/fuses. Possibly requires CKDIV8 for slower/less power hungry boot
 - We've confirmed that it was the CKDIV8 fuse, rolling back that change now
+- Probably won't reprogram all the boards since not a necessary change but good exploration for ourselves =)
