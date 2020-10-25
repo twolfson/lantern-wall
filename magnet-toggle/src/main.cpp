@@ -1,9 +1,3 @@
-// Based on
-//   https://learn.sparkfun.com/tutorials/h2ohno#low-power-attiny
-//   https://www.instructables.com/id/ATtiny85-Interrupt-Barebones-Example/
-//   http://www.technoblogy.com/show?KX0
-//   https://forum.arduino.cc/index.php?topic=524949.msg3580423#msg3580423
-// TODO: Remove notes now that we have a deeper understanding of ATtiny code
 // Load in our dependencies
 #include <Arduino.h>
 #include <avr/sleep.h>
@@ -42,7 +36,6 @@ void setup() {
   // DEV: Technically in this mode, INT0 seems identical to PCINT*
 
   // Configure sleep
-  // TODO: Understand sleep mode, sleep enable, and sleep cpu
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   // Minimize power consumption (p36, 7.4)
