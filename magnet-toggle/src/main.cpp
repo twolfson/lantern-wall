@@ -24,7 +24,7 @@ bool ledState = LOW;
 
 // Define our functions
 void setup() {
-  // Set all pin modes, with default of INPUT_PULLUP to preserve power (p57)
+  // Set all pin modes, with default of INPUT_PULLUP to preserve power (p57, 10.2.6)
   static_assert(PB0 == LED_PIN, "Expected LED_PIN to be PB0");
   pinMode(PB0, OUTPUT);
   pinMode(PB1, INPUT_PULLUP);
@@ -43,16 +43,18 @@ void setup() {
 
   // Configure sleep
   // TODO: Understand sleep mode, sleep enable, and sleep cpu
-  ADCSRA &= ~(1<<ADEN); // Disable ADC, saves ~230uA
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
-  // TODO: Minimize power consumption (p36, 7.4)
-  // ADC
-  // Analog comparator
-  // BOD
-  // Internal voltage reference
-  // Watchdog timer
-  // Port pins
+  // Minimize power consumption (p36, 7.4)
+  //   Disable ADC (set ADEN to 0) (p136, 17.13.2)
+  ADCSRA &= ~(1 << ADEN);
+  //   Disable analog comparator (set ACD to 1) (p120, 16.2.2)
+  ACSR |= (1 << ACD);
+  //   Disabled BOD via fuses (see `platformio.ini`) (p41, 8.2.3)
+  //   Disabled internal voltage reference, handled by disabling ADC, analog comparator, and BOD (p42, 8.3.1)
+  //   Disabled watchdog timer via fuses (see `platformio.ini`) (p43, 8.4)
+  //     Can be enabled programmatically even with this fuse set but we don't
+  //   Explicitly configured port pins, handled at top of `setup` (p57, 10.2.6)
 
   // Set up our default LED state
   digitalWrite(LED_PIN, ledState);
